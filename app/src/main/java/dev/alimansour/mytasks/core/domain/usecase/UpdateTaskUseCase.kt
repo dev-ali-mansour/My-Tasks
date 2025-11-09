@@ -6,8 +6,8 @@ import dev.alimansour.mytasks.core.domain.model.Task
 import dev.alimansour.mytasks.core.domain.repository.TasksRepository
 import kotlinx.coroutines.flow.Flow
 
-class DeleteTasksUseCase(
+class UpdateTaskUseCase(
     private val repository: TasksRepository,
 ) {
-    operator fun invoke(task: Task): Flow<Result<Unit, DataError.Local>> = repository.deleteTask(task)
+    operator fun invoke(task: Task): Flow<Result<Unit, DataError.Local>> = repository.updateTask(task)
 }
