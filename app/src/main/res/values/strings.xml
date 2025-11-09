@@ -18,6 +18,14 @@
     <string name="due_today">Due Today</string>
     <string name="due_tomorrow">Due Tomorrow</string>
     <string name="due_in_days">Due in %1$d days</string>
+    <string name="new_task">New Task</string>
+    <string name="close">Close</string>
+    <string name="task_title">Task Title</string>
+    <string name="description">Description</string>
+    <string name="save_task">Save Task</string>
+    <string name="select_date">Select Date</string>
+    <string name="due_date">Due Date</string>
+    <string name="task_add_success">Task has been added successfully</string>
     <plurals name="due_days_ago">
         <item quantity="one">Due %1$d day ago</item>
         <item quantity="other">Due %1$d days ago</item>
