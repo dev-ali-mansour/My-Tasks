@@ -28,6 +28,7 @@ import dev.alimansour.mytasks.ui.theme.interFamily
 fun TaskItem(
     task: Task,
     onCheckedChange: (Boolean) -> Unit,
+    onItemClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -36,7 +37,7 @@ fun TaskItem(
         modifier =
             modifier
                 .fillMaxWidth()
-                .clickable { onCheckedChange(!task.isCompleted) }
+                .clickable { onItemClick() }
                 .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
         Checkbox(
