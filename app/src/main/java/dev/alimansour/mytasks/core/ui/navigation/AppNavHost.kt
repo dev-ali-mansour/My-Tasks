@@ -7,6 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import dev.alimansour.mytasks.core.ui.utils.UiText
 import dev.alimansour.mytasks.feature.home.HomeScreen
 
 @Composable
@@ -14,6 +15,7 @@ fun AppNavHost(
     modifier: Modifier,
     onSetTopBar: (@Composable () -> Unit) -> Unit,
     onSetFab: (@Composable () -> Unit) -> Unit,
+    showError: (message: UiText) -> Unit,
 ) {
     val navController = rememberNavController()
 
@@ -31,7 +33,8 @@ fun AppNavHost(
                 },
                 onSetTopBar = onSetTopBar,
                 onSetFab = onSetFab,
-                showError = {},
+                onFabClick = { navController.navigate(Route.NewTask) },
+                showError = showError,
             )
         }
     }

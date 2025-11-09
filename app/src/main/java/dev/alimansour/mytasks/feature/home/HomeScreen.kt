@@ -1,6 +1,5 @@
 package dev.alimansour.mytasks.feature.home
 
-import android.content.Context
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -22,7 +21,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -33,6 +31,7 @@ import dev.alimansour.mytasks.R
 import dev.alimansour.mytasks.core.domain.model.Task
 import dev.alimansour.mytasks.core.ui.common.LaunchedUiEffectHandler
 import dev.alimansour.mytasks.core.ui.navigation.Route
+import dev.alimansour.mytasks.core.ui.utils.UiText
 import dev.alimansour.mytasks.ui.theme.MyTasksTheme
 import dev.alimansour.mytasks.ui.theme.interFamily
 import org.koin.androidx.compose.koinViewModel
@@ -45,10 +44,10 @@ fun HomeScreen(
     navigateToTaskDetails: (Task) -> Unit,
     onSetTopBar: (@Composable () -> Unit) -> Unit,
     onSetFab: (@Composable () -> Unit) -> Unit,
-    showError: (message: String) -> Unit,
+    onFabClick: () -> Unit,
+    showError: (message: UiText) -> Unit,
 ) {
     val viewModel: HomeViewModel = koinViewModel()
-    val context: Context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
@@ -79,7 +78,7 @@ fun HomeScreen(
     LaunchedEffect(uiState.isFabExpanded) {
         onSetFab {
             ExtendedFloatingActionButton(
-                onClick = { /* TODO: Handle add task */ },
+                onClick = { onFabClick() },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
                 shape = RoundedCornerShape(16.dp),
@@ -100,7 +99,7 @@ fun HomeScreen(
                 is HomeEffect.NavigateToRoute -> navigateToRoute(effect.route)
                 is HomeEffect.NavigateToTaskDetails -> navigateToTaskDetails(effect.task)
                 is HomeEffect.ShowError -> {
-                    showError(effect.message.asString(context))
+                    showError(effect.message)
                 }
             }
         },
