@@ -136,6 +136,7 @@ private fun HomeContent(
                 onCheckedChange = {
                     onEvent(HomeEvent.OnTaskCheckChanged(task.copy(isCompleted = it)))
                 },
+                onItemClick = { onEvent(HomeEvent.NavigateToTaskDetailsScreen(task)) },
             )
         }
     }

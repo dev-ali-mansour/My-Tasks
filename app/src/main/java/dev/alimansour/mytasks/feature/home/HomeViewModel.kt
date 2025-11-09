@@ -53,7 +53,7 @@ class HomeViewModel(
 
             is HomeEvent.NavigateToTaskDetailsScreen ->
                 _uiState.update {
-                    it.copy(effect = NavigateToRoute(route = Route.TaskDetails))
+                    it.copy(effect = HomeEffect.NavigateToTaskDetails(task = event.task))
                 }
 
             is HomeEvent.OnTaskCheckChanged -> {
