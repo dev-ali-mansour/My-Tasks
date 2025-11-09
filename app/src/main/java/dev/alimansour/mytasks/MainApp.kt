@@ -51,7 +51,7 @@ fun MainApp() {
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar(
                         message = uiText.asString(context),
-                        duration = SnackbarDuration.Long,
+                        duration = SnackbarDuration.Short,
                     )
                 }
             },
@@ -59,7 +59,7 @@ fun MainApp() {
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar(
                         message = uiText.asString(context),
-                        duration = SnackbarDuration.Long,
+                        duration = SnackbarDuration.Short,
                     )
                 }
             },
