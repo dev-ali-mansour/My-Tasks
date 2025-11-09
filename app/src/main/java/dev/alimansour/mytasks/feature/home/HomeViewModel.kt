@@ -42,7 +42,11 @@ class HomeViewModel(
 
     fun processEvent(event: HomeEvent) {
         when (event) {
-            HomeEvent.NavigateToNewTaskScreen ->
+            is HomeEvent.OnExpandStateChanged ->
+                _uiState.update {
+                    it.copy(isFabExpanded = event.isExpanded)
+                }
+            is HomeEvent.NavigateToNewTaskScreen ->
                 _uiState.update {
                     it.copy(effect = NavigateToRoute(route = Route.NewTask))
                 }
