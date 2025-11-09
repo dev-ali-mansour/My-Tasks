@@ -16,7 +16,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import dev.alimansour.mytasks.core.ui.navigation.AppNavHost
-import dev.alimansour.mytasks.core.ui.utils.UiText
 import kotlinx.coroutines.launch
 
 @Composable
@@ -48,7 +47,15 @@ fun MainApp() {
             onSetFab = {
                 fabContent = it
             },
-            showError = { uiText: UiText ->
+            onSuccess = { uiText ->
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = uiText.asString(context),
+                        duration = SnackbarDuration.Long,
+                    )
+                }
+            },
+            showError = { uiText ->
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar(
                         message = uiText.asString(context),

@@ -9,12 +9,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dev.alimansour.mytasks.core.ui.utils.UiText
 import dev.alimansour.mytasks.feature.home.HomeScreen
+import dev.alimansour.mytasks.feature.task.add.NewTaskScreen
 
 @Composable
 fun AppNavHost(
     modifier: Modifier,
     onSetTopBar: (@Composable () -> Unit) -> Unit,
     onSetFab: (@Composable () -> Unit) -> Unit,
+    onSuccess: (message: UiText) -> Unit,
     showError: (message: UiText) -> Unit,
 ) {
     val navController = rememberNavController()
@@ -34,6 +36,19 @@ fun AppNavHost(
                 onSetTopBar = onSetTopBar,
                 onSetFab = onSetFab,
                 onFabClick = { navController.navigate(Route.NewTask) },
+                showError = showError,
+            )
+        }
+
+        composable<Route.NewTask> {
+            NewTaskScreen(
+                onNavigationIconClicked = { navController.navigateUpSafely() },
+                onSuccess = {
+                    onSuccess(it)
+                    navController.navigateUpSafely()
+                },
+                onSetTopBar = onSetTopBar,
+                onSetFab = onSetFab,
                 showError = showError,
             )
         }
