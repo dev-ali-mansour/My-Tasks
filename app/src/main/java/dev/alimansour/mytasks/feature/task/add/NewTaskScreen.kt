@@ -154,7 +154,7 @@ private fun NewTaskContent(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
                 .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.SpaceBetween, // Pushes button to bottom
+        verticalArrangement = Arrangement.SpaceBetween,
     ) {
         Column {
             TextField(
