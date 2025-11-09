@@ -5,16 +5,16 @@ import dev.alimansour.mytasks.core.domain.model.Task
 
 fun TaskEntity.toTask(): Task =
     Task(
-        title = title,
-        description = description,
-        dueDate = dueDate,
-        status = status,
+        title = this.title,
+        description = this.description,
+        dueDate = this.dueDate,
+        isCompleted = this.isCompleted,
     )
 
 fun Task.toTaskEntity(): TaskEntity =
     TaskEntity(
-        title = title,
-        description = description,
-        dueDate = dueDate,
-        status = status,
+        title = this.title,
+        description = this.description,
+        dueDate = this.dueDate,
+        isCompleted = this.isCompleted,
     )

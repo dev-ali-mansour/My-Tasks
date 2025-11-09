@@ -1,9 +1,11 @@
 package dev.alimansour.mytasks.feature.home
 
+import androidx.compose.runtime.Stable
 import dev.alimansour.mytasks.core.domain.model.Task
 import dev.alimansour.mytasks.core.ui.navigation.Route
 import dev.alimansour.mytasks.core.ui.utils.UiText
 
+@Stable
 data class HomeState(
     val isLoading: Boolean = false,
     val tasks: List<Task> = emptyList(),
@@ -15,6 +17,10 @@ sealed interface HomeEffect {
         val route: Route,
     ) : HomeEffect
 
+    data class NavigateToTaskDetails(
+        val task: Task,
+    ) : HomeEffect
+
     data class ShowError(
         val message: UiText,
     ) : HomeEffect
@@ -24,6 +30,10 @@ sealed interface HomeEvent {
     object NavigateToNewTaskScreen : HomeEvent
 
     data class NavigateToTaskDetailsScreen(
+        val task: Task,
+    ) : HomeEvent
+
+    data class OnTaskCheckChanged(
         val task: Task,
     ) : HomeEvent
 
