@@ -7,6 +7,9 @@ import dev.alimansour.mytasks.core.domain.model.onError
 import dev.alimansour.mytasks.core.domain.model.onSuccess
 import dev.alimansour.mytasks.core.domain.usecase.AddTaskUseCase
 import dev.alimansour.mytasks.core.ui.utils.toUiText
+import dev.alimansour.mytasks.feature.task.NewTaskEvent
+import dev.alimansour.mytasks.feature.task.TaskEffect
+import dev.alimansour.mytasks.feature.task.TaskState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +26,7 @@ class NewTaskViewModel(
     private val addTaskUseCase: AddTaskUseCase,
 ) : ViewModel() {
     private var addTaskJob: Job? = null
-    private val _uiState = MutableStateFlow(NewTaskState())
+    private val _uiState = MutableStateFlow(TaskState())
     val uiState =
         _uiState
             .stateIn(
@@ -67,11 +70,11 @@ class NewTaskViewModel(
                 result
                     .onSuccess {
                         _uiState.update {
-                            it.copy(isLoading = false, effect = NewTaskEffect.ShowSuccess)
+                            it.copy(isLoading = false, effect = TaskEffect.ShowSuccess)
                         }
                     }.onError { error ->
                         _uiState.update {
-                            it.copy(isLoading = false, effect = NewTaskEffect.ShowError(message = error.toUiText()))
+                            it.copy(isLoading = false, effect = TaskEffect.ShowError(message = error.toUiText()))
                         }
                     }
             }
