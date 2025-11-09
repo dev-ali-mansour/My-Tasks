@@ -4,5 +4,5 @@ import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Module
 
 @Module(includes = [UseCaseModule::class])
-@ComponentScan("eg.edu.cu.csds.icare")
+@ComponentScan("dev.alimansour.mytasks")
 class AppModule
