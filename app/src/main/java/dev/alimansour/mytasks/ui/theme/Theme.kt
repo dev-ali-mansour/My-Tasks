@@ -19,6 +19,8 @@ private val DarkColorScheme =
         onBackground = TextWhite,
         onSurface = TextWhite,
         onSurfaceVariant = TextGray,
+        primaryContainer = PrimaryContainerDark,
+        onPrimaryContainer = OnPrimaryContainerDark,
         // For secondary text like "Due Today"
         // You can fill in the rest (secondary, tertiary, error) as needed
     )
@@ -32,6 +34,8 @@ private val LightColorScheme =
         onBackground = LightText,
         onSurface = LightText,
         onSurfaceVariant = LightSecondaryText,
+        primaryContainer = PrimaryContainerLight,
+        onPrimaryContainer = OnPrimaryContainerLight,
         // For less important text// For secondary text
         // You can fill in the rest (secondary, tertiary, error) as needed
     )
