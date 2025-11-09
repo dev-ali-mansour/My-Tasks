@@ -128,7 +128,9 @@ private fun HomeContent(
         modifier = Modifier.fillMaxSize(),
         state = listState,
     ) {
-        items(uiState.tasks) { task ->
+        items(uiState.tasks, key = { task ->
+            task.id
+        }) { task ->
             TaskItem(
                 task = task,
                 onCheckedChange = {
