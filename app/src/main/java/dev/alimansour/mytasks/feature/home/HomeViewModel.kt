@@ -67,11 +67,16 @@ class HomeViewModel(
 
     private fun updateTask(task: Task) =
         viewModelScope.launch(dispatcher) {
+            _uiState.update { it.copy(isLoading = true) }
             updateTaskUseCase(task).collect { result ->
                 result
-                    .onError { error ->
+                    .onSuccess {
                         _uiState.update {
-                            it.copy(effect = HomeEffect.ShowError(message = error.toUiText()))
+                            it.copy(isLoading = false)
+                        }
+                    }.onError { error ->
+                        _uiState.update {
+                            it.copy(isLoading = false, effect = HomeEffect.ShowError(message = error.toUiText()))
                         }
                     }
             }
@@ -79,15 +84,16 @@ class HomeViewModel(
 
     private fun getTasks() =
         viewModelScope.launch(dispatcher) {
+            _uiState.update { it.copy(isLoading = true) }
             getTasksUseCase().collect { result ->
                 result
                     .onSuccess { tasks ->
                         _uiState.update {
-                            it.copy(tasks = tasks)
+                            it.copy(isLoading = false, tasks = tasks)
                         }
                     }.onError { error ->
                         _uiState.update {
-                            it.copy(effect = HomeEffect.ShowError(message = error.toUiText()))
+                            it.copy(isLoading = false, effect = HomeEffect.ShowError(message = error.toUiText()))
                         }
                     }
             }
