@@ -2,10 +2,12 @@ package dev.alimansour.mytasks.feature.task.add
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dev.alimansour.mytasks.R
 import dev.alimansour.mytasks.core.domain.model.Task
 import dev.alimansour.mytasks.core.domain.model.onError
 import dev.alimansour.mytasks.core.domain.model.onSuccess
 import dev.alimansour.mytasks.core.domain.usecase.AddTaskUseCase
+import dev.alimansour.mytasks.core.ui.utils.UiText
 import dev.alimansour.mytasks.core.ui.utils.toUiText
 import dev.alimansour.mytasks.feature.task.NewTaskEvent
 import dev.alimansour.mytasks.feature.task.TaskEffect
@@ -40,6 +42,7 @@ class NewTaskViewModel(
         when (event) {
             is NewTaskEvent.UpdateTitle ->
                 _uiState.update { it.copy(title = event.title) }
+
             is NewTaskEvent.UpdateDescription ->
                 _uiState.update { it.copy(description = event.description) }
 
@@ -49,8 +52,28 @@ class NewTaskViewModel(
                 }
 
             is NewTaskEvent.Proceed -> {
-                addTaskJob?.cancel()
-                addTaskJob = launchAddNewTask()
+                when {
+                    uiState.value.title.isBlank() ->
+                        _uiState.update {
+                            it.copy(
+                                effect =
+                                    TaskEffect.ShowError(message = UiText.StringResourceId(R.string.title_cannot_be_empty)),
+                            )
+                        }
+
+                    uiState.value.description.isBlank() ->
+                        _uiState.update {
+                            it.copy(
+                                effect =
+                                    TaskEffect.ShowError(message = UiText.StringResourceId(R.string.description_cannot_be_empty)),
+                            )
+                        }
+
+                    else -> {
+                        addTaskJob?.cancel()
+                        addTaskJob = launchAddNewTask()
+                    }
+                }
             }
 
             is NewTaskEvent.ConsumeEffect -> _uiState.update { it.copy(effect = null) }
