@@ -26,6 +26,8 @@
     <string name="select_date">Select Date</string>
     <string name="due_date">Due Date</string>
     <string name="task_add_success">Task has been added successfully</string>
+    <string name="title_cannot_be_empty">Title cannot be empty</string>
+    <string name="description_cannot_be_empty">Description can not be empty\n</string>
     <plurals name="due_days_ago">
         <item quantity="one">Due %1$d day ago</item>
         <item quantity="other">Due %1$d days ago</item>
