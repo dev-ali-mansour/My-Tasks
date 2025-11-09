@@ -10,9 +10,9 @@ class TaskStatusConverter {
     @TypeConverter
     fun toTaskStatus(value: String?): TaskStatus? {
         if (value == null) return null
-        return try {
+        return runCatching {
             TaskStatus.valueOf(value)
-        } catch (e: IllegalArgumentException) {
+        }.getOrElse {
             // If unknown value is stored in DB, default to Pending
             TaskStatus.Pending
         }

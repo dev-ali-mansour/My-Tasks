@@ -30,41 +30,38 @@ class TasksRepositoryImpl(
 
     override fun addTask(task: Task): Flow<Result<Unit, DataError.Local>> =
         flow {
-            try {
+            runCatching {
                 taskDao.insertTask(task.toTaskEntity())
                 emit(Result.Success(Unit))
-            } catch (e: Exception) {
-                // Log the exception 'e' if needed
+            }.onFailure {
                 emit(Result.Error(DataError.Local.DATABASE_WRITE_ERROR))
             }
         }
 
     override fun updateTask(task: Task): Flow<Result<Unit, DataError.Local>> =
         flow {
-            try {
+            runCatching {
                 val affectedRows = taskDao.updateTask(task.toTaskEntity())
                 if (affectedRows > 0) {
                     emit(Result.Success(Unit))
                 } else {
                     emit(Result.Error(DataError.Local.DATABASE_WRITE_ERROR))
                 }
-            } catch (e: Exception) {
-                // Log the exception 'e' if needed
+            }.onFailure {
                 emit(Result.Error(DataError.Local.DATABASE_WRITE_ERROR))
             }
         }
 
     override fun deleteTask(task: Task): Flow<Result<Unit, DataError.Local>> =
         flow {
-            try {
+            runCatching {
                 val affectedRows = taskDao.deleteTask(task.toTaskEntity())
                 if (affectedRows > 0) {
                     emit(Result.Success(Unit))
                 } else {
                     emit(Result.Error(DataError.Local.DATABASE_WRITE_ERROR))
                 }
-            } catch (e: Exception) {
-                // Log the exception 'e' if needed
+            }.onFailure {
                 emit(Result.Error(DataError.Local.DATABASE_WRITE_ERROR))
             }
         }
