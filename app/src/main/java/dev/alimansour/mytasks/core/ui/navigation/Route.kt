@@ -12,4 +12,7 @@ sealed class Route {
 
     @Serializable
     data object TaskDetails : Route()
+
+    @Serializable
+    data object UpdateTask : Route()
 }
