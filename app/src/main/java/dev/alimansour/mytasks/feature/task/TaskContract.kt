@@ -7,6 +7,7 @@ import dev.alimansour.mytasks.core.ui.utils.UiText
 @Stable
 data class TaskState(
     val isLoading: Boolean = false,
+    val id: Long = 0,
     val title: String = "",
     val description: String = "",
     val dueDate: Long = System.currentTimeMillis(),
