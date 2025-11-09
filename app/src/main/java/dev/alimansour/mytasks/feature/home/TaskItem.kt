@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.alimansour.mytasks.core.domain.model.Task
 import dev.alimansour.mytasks.core.ui.utils.formatDueDate
+import dev.alimansour.mytasks.ui.theme.interFamily
 
 @Composable
 fun TaskItem(
@@ -54,6 +55,7 @@ fun TaskItem(
             Text(
                 text = task.title,
                 color = MaterialTheme.colorScheme.onBackground,
+                fontFamily = interFamily,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Medium,
             )
@@ -61,6 +63,7 @@ fun TaskItem(
             Text(
                 text = context.formatDueDate(task.dueDate),
                 color = MaterialTheme.colorScheme.primary,
+                fontFamily = interFamily,
                 fontSize = 14.sp,
             )
         }
