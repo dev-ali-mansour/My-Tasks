@@ -2,10 +2,24 @@ package dev.alimansour.mytasks.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+// Shared Brand Color
+val BrandGreen = Color(0xFF3DDC84)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+// 1. Dark Theme Colors (From your screenshot)
+val DarkGreenBackground = Color(0xFF0D1F0D)
+val BrightGreenAccent = Color(0xFF3DDC84)
+val DarkOnPrimary = Color(0xFF002108) // Dark color for text/icons on the accent
+val TextWhite = Color(0xFFE3E3E3) // Main text
+val TextGray = Color(0xFFBFC9B9) // Secondary text ("Due Today")
+
+// 2. Light Theme Colors (Complementary)
+val LightBackground = Color(0xFFFFFFFF)
+val PrimaryGreen = Color(0xFF006E2B) // A more standard M3 primary green
+val OnPrimaryWhite = Color(0xFFFFFFFF)
+val LightPrimaryContainer = Color(0xFF97F9A2)
+val DarkText = Color(0xFF191C18)
+val SecondaryDarkText = Color(0xFF414940)
+val OnPrimaryContainerDark = Color(0xFF002108)
+val LightOnPrimary = Color(0xFFFFFFFF) // White '+' on the green FAB
+val LightText = Color(0xFF191C18) // Very dark (almost black) for main text
+val LightSecondaryText = Color(0xFF414940) // A standard gray for secondary text/outlines
