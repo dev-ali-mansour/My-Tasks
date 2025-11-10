@@ -18,6 +18,8 @@ koinBom = "4.1.1"
 koinAnnotations = "2.3.0"
 room = "2.8.3"
 ksp = "2.3.1"
+mockk = "1.13.8"
+
 
 
 [libraries]
@@ -55,6 +57,7 @@ room = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 
 [bundles]
 koin-core = [
