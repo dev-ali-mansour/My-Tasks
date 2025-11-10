@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.room)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.junit5)
 }
 
 room {
@@ -58,9 +59,15 @@ android {
         }
     }
 
-    testOptions.unitTests {
-        isIncludeAndroidResources = true
-        isReturnDefaultValues = true
+    testOptions {
+        unitTests.all {
+            it.useJUnitPlatform()
+            it.jvmArgs("-XX:+EnableDynamicAgentLoading")
+        }
+        unitTests {
+            isIncludeAndroidResources = true
+            isReturnDefaultValues = true
+        }
     }
 
     sourceSets {
@@ -97,7 +104,9 @@ dependencies {
     ksp(libs.koin.ksp.compiler)
     implementation(libs.bundles.room)
     ksp(libs.room.compiler)
-    testImplementation(libs.junit)
+    testImplementation(libs.junit5.api)
+    testRuntimeOnly(libs.junit5.engine)
+    testImplementation(libs.junit5.params)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.room.testing)
     testImplementation(libs.mockk)
