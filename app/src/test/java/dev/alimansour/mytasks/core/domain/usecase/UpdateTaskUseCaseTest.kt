@@ -15,22 +15,22 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class AddTaskUseCaseTest {
-    private lateinit var addTaskUseCase: AddTaskUseCase
+class UpdateTaskUseCaseTest {
+    private lateinit var updateTaskUseCase: UpdateTaskUseCase
     private lateinit var tasksRepository: TasksRepository
     private val task =
         Task(
-            id = 0,
-            title = "New Task",
-            description = "Write unit tests",
-            dueDate = 1_700_000_000_000L,
-            isCompleted = false,
+            id = 1,
+            title = "Updated Task",
+            description = "Refine unit tests",
+            dueDate = 1_700_000_100_000L,
+            isCompleted = true,
         )
 
     @BeforeEach
     fun setUp() {
         tasksRepository = mockk()
-        addTaskUseCase = AddTaskUseCase(tasksRepository)
+        updateTaskUseCase = UpdateTaskUseCase(tasksRepository)
     }
 
     @Test
@@ -38,10 +38,10 @@ class AddTaskUseCaseTest {
         runTest {
             // Given
             val expected = Result.Success(Unit)
-            coEvery { tasksRepository.addTask(task) } returns flowOf(expected)
+            coEvery { tasksRepository.updateTask(task) } returns flowOf(expected)
 
             // When
-            val result = addTaskUseCase(task).first()
+            val result = updateTaskUseCase(task).first()
 
             // Then
             assertEquals(expected, result)
@@ -52,10 +52,10 @@ class AddTaskUseCaseTest {
         runTest {
             // Given
             val expected = Result.Error(DataError.Local.DATABASE_WRITE_ERROR)
-            coEvery { tasksRepository.addTask(task) } returns flowOf(expected)
+            coEvery { tasksRepository.updateTask(task) } returns flowOf(expected)
 
             // When
-            val result = addTaskUseCase(task).first()
+            val result = updateTaskUseCase(task).first()
 
             // Then
             assertEquals(expected, result)
@@ -65,13 +65,13 @@ class AddTaskUseCaseTest {
     fun `should invoke repository exactly once with the same task when flow is collected`() =
         runTest {
             // Given
-            coEvery { tasksRepository.addTask(task) } returns flowOf(Result.Success(Unit))
+            coEvery { tasksRepository.updateTask(task) } returns flowOf(Result.Success(Unit))
 
             // When
-            addTaskUseCase(task).first()
+            updateTaskUseCase(task).first()
 
             // Then
-            verify(exactly = 1) { tasksRepository.addTask(task).let { } }
+            verify(exactly = 1) { tasksRepository.updateTask(task).let { } }
         }
 
     @Test
@@ -80,15 +80,16 @@ class AddTaskUseCaseTest {
             // Given
             val emissions =
                 listOf(
+                    Result.Success(Unit),
                     Result.Error(DataError.Local.DATABASE_WRITE_ERROR),
                     Result.Success(Unit),
                 )
-            coEvery { tasksRepository.addTask(task) } returns flowOf(*emissions.toTypedArray())
+            coEvery { tasksRepository.updateTask(task) } returns flowOf(*emissions.toTypedArray())
 
             val collected = mutableListOf<Result<Unit, DataError.Local>>()
 
             // When
-            addTaskUseCase(task).toList(collected)
+            updateTaskUseCase(task).toList(collected)
 
             // Then
             assertEquals(emissions, collected)
