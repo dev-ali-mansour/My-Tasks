@@ -16,9 +16,16 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class DeleteTaskUseCaseTest {
-
     private lateinit var deleteTaskUseCase: DeleteTaskUseCase
     private lateinit var tasksRepository: TasksRepository
+    private val task =
+        Task(
+            id = 42,
+            title = "Task to delete",
+            description = "Clean up old task",
+            dueDate = 1_700_000_200_000L,
+            isCompleted = true,
+        )
 
     @BeforeEach
     fun setUp() {
@@ -26,72 +33,64 @@ class DeleteTaskUseCaseTest {
         deleteTaskUseCase = DeleteTaskUseCase(tasksRepository)
     }
 
-    private fun sampleTask(): Task = Task(
-        id = 42,
-        title = "Task to delete",
-        description = "Clean up old task",
-        dueDate = 1_700_000_200_000L,
-        isCompleted = true,
-    )
+    @Test
+    fun `should emit Success when repository returns Success`() =
+        runTest {
+            // Given
+            val expected = Result.Success(Unit)
+            coEvery { tasksRepository.deleteTask(task) } returns flowOf(expected)
+
+            // When
+            val result = deleteTaskUseCase(task).first()
+
+            // Then
+            assertEquals(expected, result)
+        }
 
     @Test
-    fun `should emit Success when repository returns Success`() = runTest {
-        // Given
-        val task = sampleTask()
-        val expected = Result.Success(Unit)
-        coEvery { tasksRepository.deleteTask(task) } returns flowOf(expected)
+    fun `should emit Error when repository returns Error`() =
+        runTest {
+            // Given
+            val expected = Result.Error(DataError.Local.DATABASE_WRITE_ERROR)
+            coEvery { tasksRepository.deleteTask(task) } returns flowOf(expected)
 
-        // When
-        val result = deleteTaskUseCase(task).first()
+            // When
+            val result = deleteTaskUseCase(task).first()
 
-        // Then
-        assertEquals(expected, result)
-    }
-
-    @Test
-    fun `should emit Error when repository returns Error`() = runTest {
-        // Given
-        val task = sampleTask()
-        val expected = Result.Error(DataError.Local.DATABASE_WRITE_ERROR)
-        coEvery { tasksRepository.deleteTask(task) } returns flowOf(expected)
-
-        // When
-        val result = deleteTaskUseCase(task).first()
-
-        // Then
-        assertEquals(expected, result)
-    }
+            // Then
+            assertEquals(expected, result)
+        }
 
     @Test
-    fun `should invoke repository exactly once with the same task when flow is collected`() = runTest {
-        // Given
-        val task = sampleTask()
-        coEvery { tasksRepository.deleteTask(task) } returns flowOf(Result.Success(Unit))
+    fun `should invoke repository exactly once with the same task when flow is collected`() =
+        runTest {
+            // Given
+            coEvery { tasksRepository.deleteTask(task) } returns flowOf(Result.Success(Unit))
 
-        // When
-        deleteTaskUseCase(task).first()
+            // When
+            deleteTaskUseCase(task).first()
 
-        // Then
-        verify(exactly = 1) { tasksRepository.deleteTask(task).let { } }
-    }
+            // Then
+            verify(exactly = 1) { tasksRepository.deleteTask(task).let { } }
+        }
 
     @Test
-    fun `should propagate multiple emissions from repository unchanged`() = runTest {
-        // Given (delete is typically single-emission; we still ensure pass-through semantics)
-        val task = sampleTask()
-        val emissions = listOf(
-            Result.Success(Unit),
-            Result.Error(DataError.Local.DATABASE_WRITE_ERROR),
-        )
-        coEvery { tasksRepository.deleteTask(task) } returns flowOf(*emissions.toTypedArray())
+    fun `should propagate multiple emissions from repository unchanged`() =
+        runTest {
+            // Given
+            val emissions =
+                listOf(
+                    Result.Success(Unit),
+                    Result.Error(DataError.Local.DATABASE_WRITE_ERROR),
+                )
+            coEvery { tasksRepository.deleteTask(task) } returns flowOf(*emissions.toTypedArray())
 
-        val collected = mutableListOf<Result<Unit, DataError.Local>>()
+            val collected = mutableListOf<Result<Unit, DataError.Local>>()
 
-        // When
-        deleteTaskUseCase(task).toList(collected)
+            // When
+            deleteTaskUseCase(task).toList(collected)
 
-        // Then
-        assertEquals(emissions, collected)
-    }
+            // Then
+            assertEquals(emissions, collected)
+        }
 }
-
