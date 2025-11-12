@@ -8,6 +8,7 @@ import dev.alimansour.mytasks.core.domain.model.DataError
 import dev.alimansour.mytasks.core.domain.model.Result
 import dev.alimansour.mytasks.core.domain.model.Task
 import dev.alimansour.mytasks.core.domain.repository.TasksRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -33,8 +34,11 @@ class TasksRepositoryImpl(
             runCatching {
                 taskDao.insertTask(task.toTaskEntity())
                 emit(Result.Success(Unit))
-            }.onFailure {
-                emit(Result.Error(DataError.Local.DATABASE_WRITE_ERROR))
+            }.onFailure { error ->
+                when (error) {
+                    is CancellationException -> throw error
+                    else -> emit(Result.Error(DataError.Local.DATABASE_WRITE_ERROR))
+                }
             }
         }
 
@@ -47,8 +51,11 @@ class TasksRepositoryImpl(
                 } else {
                     emit(Result.Error(DataError.Local.DATABASE_WRITE_ERROR))
                 }
-            }.onFailure {
-                emit(Result.Error(DataError.Local.DATABASE_WRITE_ERROR))
+            }.onFailure { error ->
+                when (error) {
+                    is CancellationException -> throw error
+                    else -> emit(Result.Error(DataError.Local.DATABASE_WRITE_ERROR))
+                }
             }
         }
 
@@ -61,8 +68,11 @@ class TasksRepositoryImpl(
                 } else {
                     emit(Result.Error(DataError.Local.DATABASE_WRITE_ERROR))
                 }
-            }.onFailure {
-                emit(Result.Error(DataError.Local.DATABASE_WRITE_ERROR))
+            }.onFailure { error ->
+                when (error) {
+                    is CancellationException -> throw error
+                    else -> emit(Result.Error(DataError.Local.DATABASE_WRITE_ERROR))
+                }
             }
         }
 }
