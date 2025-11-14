@@ -122,7 +122,7 @@ private fun TaskDetailsContent(
 
         Column(
             modifier =
-                Modifier
+                modifier
                     .padding(16.dp)
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState()),
@@ -238,7 +238,7 @@ private fun DetailItem(
 @PreviewLightDark
 @Composable
 private fun TaskDetailsContentPreview() {
-    MyTasksTheme {
+    MyTasksTheme(dynamicColor = false) {
         TaskDetailsContent(
             uiState =
                 TaskDetailsState(

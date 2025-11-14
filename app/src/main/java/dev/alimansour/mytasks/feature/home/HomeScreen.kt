@@ -146,22 +146,25 @@ private fun HomeContent(
 @PreviewLightDark
 @Composable
 private fun HomeContentPreview() {
-    MyTasksTheme {
+    MyTasksTheme(dynamicColor = false) {
         HomeContent(
             uiState =
                 HomeState(
                     tasks =
                         listOf(
                             Task(
+                                id = 1,
                                 title = "Grocery Shopping",
                                 dueDate = System.currentTimeMillis(),
                             ),
                             Task(
+                                id = 2,
                                 title = "Book Appointment",
                                 dueDate = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(1),
                             ),
-                            Task(title = "Pay Bills", dueDate = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(2)),
+                            Task(id = 3, title = "Pay Bills", dueDate = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(2)),
                             Task(
+                                id = 4,
                                 title = "Schedule Meeting",
                                 dueDate = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(3),
                             ),

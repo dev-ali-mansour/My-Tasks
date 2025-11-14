@@ -308,7 +308,7 @@ fun TaskDatePicker(
 @PreviewLightDark
 @Composable
 private fun NewTaskContentPreview() {
-    MyTasksTheme {
+    MyTasksTheme(dynamicColor = false) {
         NewTaskContent(
             uiState =
                 TaskState(
