@@ -77,7 +77,7 @@ My-Tasks/
 ### 1. Clone the repository
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/dev-ali-mansour/My-Tasks.git
 cd My-Tasks
 ```
 
