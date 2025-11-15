@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.room)
     alias(libs.plugins.ksp)
     alias(libs.plugins.junit5)
+    alias(libs.plugins.jacoco)
 }
 
 room {
@@ -74,6 +75,76 @@ android {
         getByName("test") {
             resources.srcDir("src/test/resources")
         }
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.10"
+}
+
+tasks.register<JacocoReport>("jacocoTestReport") {
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        csv.required.set(false)
+    }
+
+    val debugTreeKotlin =
+        fileTree(
+            mapOf(
+                "dir" to "${layout.buildDirectory}/tmp/kotlin-classes/debug",
+                "excludes" to
+                    listOf(
+                        "**/R.class",
+                        "**/R$*.class",
+                        "**/BuildConfig.*",
+                        "**/Manifest*.*",
+                        "**/*Test*.*",
+                        "**/*_MembersInjector.class",
+                        "**/di/**",
+                        "**/*_Factory*.class",
+                        "**/*_Provide*Factory*.class",
+                        "**/*_Impl*.class",
+                        "**/*Companion*.class",
+                    ),
+            ),
+        )
+
+    val debugTreeJava =
+        fileTree(
+            mapOf(
+                "dir" to "${layout.buildDirectory}/intermediates/javac/debug/classes",
+                "excludes" to
+                    listOf(
+                        "**/R.class",
+                        "**/R$*.class",
+                        "**/BuildConfig.*",
+                        "**/Manifest*.*",
+                        "**/*Test*.*",
+                    ),
+            ),
+        )
+
+    classDirectories.setFrom(files(debugTreeKotlin, debugTreeJava))
+    sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
+    executionData.setFrom(
+        fileTree(layout.buildDirectory) {
+            include(
+                "**/jacoco/testDebugUnitTest.exec",
+                "**/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
+                "**/jacoco/test.exec",
+            )
+        },
+    )
+}
+
+// Ensure unit tests produce JaCoCo execution data
+tasks.withType<Test>().configureEach {
+    extensions.configure(JacocoTaskExtension::class) {
+        isIncludeNoLocationClasses = true
+        excludes = listOf("jdk.internal.*")
     }
 }
 
