@@ -1,0 +1,43 @@
+name: Run tests
+run-name: Run test - ${{ github.head_ref }}
+
+# TODO: [1] Configure the trigger of this action to only run on pull requests to main
+
+jobs:
+  validate_pr_sources:
+    # TODO: [2] Configure the runner of this job to the latest Ubuntu version
+    steps:
+      - name: Validate source branch
+        id: source_check
+        run: |
+          echo "Source branch is: ${{ github.head_ref }}"
+          # Allow only branches matching release/<major>.<minor>.<patch> or hotfix/<major>.<minor>.<patch>
+          if [[ "${{ github.head_ref }}" =~ ^(release|hotfix)/[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "✅ Pull request source is a valid release/hotfix branch."
+          else
+            echo "::error::❌ PRs to main are only allowed from release/x.y.z or hotfix/x.y.z branches (e.g., release/1.2.3 or hotfix/1.2.3). Got: ${{ github.head_ref }}"
+            exit 1
+          fi
+
+  run-tests:
+    # TODO: [3] Configure this job to run after the source branch is validated
+    runs-on: ubuntu-latest
+
+    steps:
+      # TODO: [4] Checkout the source branch
+
+      # TODO: [5] Setup JAVA 21 and install Gradle
+
+      - name: Cache Gradle files
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties', '**/gradle.lockfile') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # TODO: [6] Grant execution permission for the Gradle wrapper file
+
+      # TODO: [7] Run the unit tests
