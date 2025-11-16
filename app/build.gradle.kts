@@ -24,7 +24,7 @@ android {
     compileSdk = 36
 
     signingConfigs {
-        if (providers.environmentVariable("KEYSTORE_PASSWORD").isPresent) {
+        if (project.getSecret("KEYSTORE_PASSWORD").isNotEmpty()) {
             create("release") {
                 storeFile =
                     project.rootProject.layout.projectDirectory
