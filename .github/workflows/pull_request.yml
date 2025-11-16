@@ -23,7 +23,7 @@ jobs:
           fi
 
   run-tests:
-    needs: restrict_pr_sources
+    needs: validate_pr_sources
     runs-on: ubuntu-latest
 
     steps:
