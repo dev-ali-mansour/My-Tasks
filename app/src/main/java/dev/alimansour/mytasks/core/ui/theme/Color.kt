@@ -1,4 +1,4 @@
-package dev.alimansour.mytasks.ui.theme
+package dev.alimansour.mytasks.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
@@ -7,7 +7,6 @@ val BrandGreen = Color(0xFF3DDC84)
 
 // 1. Dark Theme Colors (From your screenshot)
 val DarkGreenBackground = Color(0xFF0D1F0D)
-val BrightGreenAccent = Color(0xFF3DDC84)
 val DarkOnPrimary = Color(0xFF002108) // Dark color for text/icons on the accent
 val TextWhite = Color(0xFFE3E3E3) // Main text
 val TextGray = Color(0xFFBFC9B9) // Secondary text ("Due Today")

@@ -1,4 +1,4 @@
-package dev.alimansour.mytasks.ui.theme
+package dev.alimansour.mytasks.core.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

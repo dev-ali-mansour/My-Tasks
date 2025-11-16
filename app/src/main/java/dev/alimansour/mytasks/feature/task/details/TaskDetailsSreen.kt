@@ -40,8 +40,8 @@ import dev.alimansour.mytasks.core.ui.common.LaunchedUiEffectHandler
 import dev.alimansour.mytasks.core.ui.utils.UiText
 import dev.alimansour.mytasks.core.ui.utils.UiText.StringResourceId
 import dev.alimansour.mytasks.core.ui.utils.getFormattedDate
-import dev.alimansour.mytasks.ui.theme.MyTasksTheme
-import dev.alimansour.mytasks.ui.theme.interFamily
+import dev.alimansour.mytasks.core.ui.theme.MyTasksTheme
+import dev.alimansour.mytasks.core.ui.theme.interFamily
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
