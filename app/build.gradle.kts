@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -17,8 +18,31 @@ room {
 
 android {
     namespace = "dev.alimansour.mytasks"
-    compileSdk {
-        version = release(36)
+    compileSdk = 36
+
+    signingConfigs {
+        if (providers.environmentVariable("KEYSTORE_PASSWORD").isPresent) {
+            create("release") {
+                storeFile =
+                    project.rootProject.layout.projectDirectory
+                        .file("release-key.jks")
+                        .asFile
+                storePassword = project.getSecret("KEYSTORE_PASSWORD")
+                keyAlias = project.getSecret("KEY_ALIAS")
+                keyPassword = project.getSecret("KEY_PASSWORD")
+                enableV1Signing = true
+                enableV2Signing = true
+            }
+        }
+
+        getByName("debug") {
+            storeFile = File(System.getProperty("user.home"), ".android/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+            enableV1Signing = true
+            enableV2Signing = true
+        }
     }
 
     defaultConfig {
@@ -32,8 +56,16 @@ android {
     }
 
     buildTypes {
+        debug {
+            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("debug")
+        }
         release {
             isMinifyEnabled = false
+            isDebuggable = false
+            if ("release" in signingConfigs.names) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
@@ -187,4 +219,15 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
+
+private fun Project.getSecret(key: String): String {
+    val localProperties =
+        Properties().apply {
+            val propertiesFile = rootProject.file("local.properties")
+            if (propertiesFile.exists()) {
+                propertiesFile.inputStream().use { load(it) }
+            }
+        }
+    return localProperties.getProperty(key) ?: System.getenv(key)
 }
