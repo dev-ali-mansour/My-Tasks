@@ -31,8 +31,8 @@ import dev.alimansour.mytasks.core.domain.model.Task
 import dev.alimansour.mytasks.core.ui.common.LaunchedUiEffectHandler
 import dev.alimansour.mytasks.core.ui.navigation.Route
 import dev.alimansour.mytasks.core.ui.utils.UiText
-import dev.alimansour.mytasks.ui.theme.MyTasksTheme
-import dev.alimansour.mytasks.ui.theme.interFamily
+import dev.alimansour.mytasks.core.ui.theme.MyTasksTheme
+import dev.alimansour.mytasks.core.ui.theme.interFamily
 import org.koin.androidx.compose.koinViewModel
 import java.util.concurrent.TimeUnit
 

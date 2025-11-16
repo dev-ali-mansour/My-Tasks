@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.alimansour.mytasks.core.domain.model.Task
 import dev.alimansour.mytasks.core.ui.utils.formatDueDate
-import dev.alimansour.mytasks.ui.theme.interFamily
+import dev.alimansour.mytasks.core.ui.theme.interFamily
 
 @Composable
 fun TaskItem(
