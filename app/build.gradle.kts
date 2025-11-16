@@ -16,6 +16,9 @@ room {
     schemaDirectory("$projectDir/schemas")
 }
 
+val dynamicVersionCode: Int? = System.getenv("VERSION_CODE")?.toIntOrNull()
+val dynamicVersionName: String? = System.getenv("VERSION_NAME")
+
 android {
     namespace = "dev.alimansour.mytasks"
     compileSdk = 36
@@ -49,8 +52,8 @@ android {
         applicationId = "dev.alimansour.mytasks"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = dynamicVersionCode ?: 1
+        versionName = dynamicVersionName ?: "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -58,6 +61,8 @@ android {
     buildTypes {
         debug {
             isMinifyEnabled = false
+            versionNameSuffix = "-debug"
+            applicationIdSuffix = ".debug"
             signingConfig = signingConfigs.getByName("debug")
         }
         release {
@@ -172,7 +177,6 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     )
 }
 
-// Ensure unit tests produce JaCoCo execution data
 tasks.withType<Test>().configureEach {
     extensions.configure(JacocoTaskExtension::class) {
         isIncludeNoLocationClasses = true
