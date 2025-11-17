@@ -38,8 +38,9 @@ A modern Android task management app built with Kotlin, Jetpack Compose, and a c
 - Clean-ish layered architecture:
   - `core/domain`: use cases and domain models
   - `core/data`: repositories and Room entities/DAOs
+  - `core/ui`: shared UI components, theme, and helper functions
   - `feature/*`: UI + ViewModels per feature (home, task details, new task, update task)
-- Unidirectional data flow: `Event -> ViewModel -> State/Effect -> UI`
+  - Unidirectional data flow using Model-View-Intent (MVI): `Event -> ViewModel -> State/Effect -> UI`
 
 **Dependency Injection & Tools**
 - Koin (with KSP for DI code generation)
