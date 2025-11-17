@@ -1,7 +1,7 @@
 *.iml
 .idea/*
 !.idea/copyright
-# Keep the code styles.
+!/.idea/icon.svg
 !/.idea/codeStyles
 /.idea/codeStyles/*
 !/.idea/codeStyles/Project.xml
