@@ -24,7 +24,7 @@ android {
     compileSdk = 36
 
     signingConfigs {
-        if (project.getSecret("KEYSTORE_PASSWORD").isNotEmpty()) {
+        if (!project.getSecret("KEYSTORE_PASSWORD").isNullOrEmpty()) {
             create("release") {
                 storeFile =
                     project.rootProject.layout.projectDirectory
@@ -225,7 +225,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
 
-private fun Project.getSecret(key: String): String {
+private fun Project.getSecret(key: String): String? {
     val localProperties =
         Properties().apply {
             val propertiesFile = rootProject.file("local.properties")
