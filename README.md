@@ -83,14 +83,67 @@ My-Tasks/
 
 ## Getting Started
 
-### 1. Clone the repository
+### 1. Fork the repository (Optional - for contributors)
+
+If you want to contribute or set up your own version with CI/CD:
+
+1. Click the **Fork** button at the top right of this repository
+2. Clone your forked repository:
+
+```bash
+git clone https://github.com/YOUR_USERNAME/My-Tasks.git
+cd My-Tasks
+```
+
+#### Setting up GitHub Secrets
+
+To enable the automated workflows (Pull Request checks and Google Play deployment), you need to configure the following secrets in your repository settings:
+
+1. Go to your forked repository on GitHub
+2. Navigate to **Settings** → **Secrets and variables** → **Actions**
+3. Click **New repository secret** and add each of the following:
+
+**Required Secrets for Release Workflow:**
+
+| Secret Name             | Description                        | How to Get It                                    |
+|-------------------------|------------------------------------|--------------------------------------------------|
+| `KEYSTORE_PASSWORD`     | Password for your Android keystore | The password you set when creating your keystore |
+| `KEY_ALIAS`             | Alias name for your signing key    | The alias you used when creating your key        |
+| `KEY_PASSWORD`          | Password for your signing key      | The password you set for your signing key        |
+| `ANDROID_KEYSTORE`      | Base64-encoded keystore file       | Run: `base64 -w 0 your-keystore.jks`             |
+| `GOOGLE_PLAY_AUTH_JSON` | Google Play service account JSON   | Download from Google Play Console → API access   |
+
+**Creating an Android Keystore (if you don't have one):**
+
+```bash
+keytool -genkey -v -keystore release-key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias your-key-alias
+```
+
+**Encoding the Keystore for GitHub Secrets:**
+
+```bash
+base64 -w 0 release-key.jks > keystore-base64.txt
+# Copy the content of keystore-base64.txt and paste it as ANDROID_KEYSTORE secret
+```
+
+**Setting up Google Play Service Account:**
+
+1. Follow this tutorial to [create a Google Play service account](https://medium.com/automating-react-native-app-release-to-google-play/create-google-play-service-account-68471d4b398b)
+2. Download the JSON key file
+3. Copy the entire JSON content and paste it as `GOOGLE_PLAY_AUTH_JSON` secret
+
+> **Note:** The release workflow will only trigger when you push a tag (e.g., `v1.0.0`). The pull request workflow runs automatically on PRs to `main` or `develop` branches.
+
+### 2. Clone the repository (Simple setup)
+
+If you just want to build and run the app locally without CI/CD:
 
 ```bash
 git clone https://github.com/dev-ali-mansour/My-Tasks.git
 cd My-Tasks
 ```
 
-### 2. Configure Java
+### 3. Configure Java
 
 On Linux, if you have JDK 21 installed at `/usr/lib/jvm/java-21-openjdk`:
 
@@ -102,13 +155,13 @@ java -version
 
 You should see a Java 21 version.
 
-### 3. Open in Android Studio
+### 4. Open in Android Studio
 
 1. `File` → `Open...`
 2. Select the `My-Tasks` folder.
 3. Let Gradle sync and KSP/Room code generation complete.
 
-### 4. Build and run
+### 5. Build and run
 
 From Android Studio:
 
