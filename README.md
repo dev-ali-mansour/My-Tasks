@@ -2,6 +2,15 @@
 
 A modern Android task management app built with Kotlin, Jetpack Compose, and a clean architecture approach. It demonstrates best practices around state-driven UIs, Kotlin coroutines and flows, Room persistence, and dependency injection with Koin.
 
+## Screenshots
+
+<p>
+  <img src="images/1.webp" width="200" alt="Screenshot 1"/>
+  <img src="images/2.webp" width="200" alt="Screenshot 2"/>
+  <img src="images/3.webp" width="200" alt="Screenshot 3"/>
+  <img src="images/4.webp" width="200" alt="Screenshot 4"/>
+</p>
+
 ## Features
 
 - Create, update, and delete tasks
