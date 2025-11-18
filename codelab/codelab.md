@@ -20,10 +20,10 @@ This codelab will guide you through completing a "skeleton" GitHub Actions workf
 The application we are working on named `My Tasks`
 
 <p>
-  <img src="../images/1.webp" width="300" alt="Screenshot 1"/>
-  <img src="../images/2.webp" width="300" alt="Screenshot 2"/><br/>
-  <img src="../images/3.webp" width="300" alt="Screenshot 3"/>
-  <img src="../images/4.webp" width="300" alt="Screenshot 4"/><br/>
+  <img src="./images/1.webp" width="300" alt="Screenshot 1"/>
+  <img src="./images/2.webp" width="300" alt="Screenshot 2"/><br/>
+  <img src="./images/3.webp" width="300" alt="Screenshot 3"/>
+  <img src="./images/4.webp" width="300" alt="Screenshot 4"/><br/>
 </p>
 
 ### 📌 What you'll build
