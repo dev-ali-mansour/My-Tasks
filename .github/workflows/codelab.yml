@@ -35,8 +35,8 @@ jobs:
           # Add go bin to the workflow's PATH
           export PATH="$PATH:$(go env GOPATH)/bin"
           
-          # Add -prefix "My-Tasks" so all links (CSS, images) work
-          claat export -prefix "My-Tasks" codelab/codelab.md
+          # Run claat.
+          claat export codelab/codelab.md
           
           # The output folder name is unchanged, it comes from the 'id'
           mv my-tasks-github-actions-codelab dist
