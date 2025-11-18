@@ -6,6 +6,7 @@ author: Ali Mansour
 lastupdated: 2025-11-24
 status: Published
 analyticsAccount: ""
+home: /My-Tasks/
 
 # Ship it Faster 🚀 Android CI/CD with GitHub Actions
 
