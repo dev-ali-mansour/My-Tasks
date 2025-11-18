@@ -34,12 +34,11 @@ jobs:
         run: |
           # Add go bin to the workflow's PATH
           export PATH="$PATH:$(go env GOPATH)/bin"
-
-          # Run claat. It will create a folder named 'my-tasks-github-actions-codelab'
-          # (from the 'URL' metadata in your markdown)
-          claat export codelab/codelab.md
-
-          # Rename the output to 'dist' for the artifact upload
+          
+          # Add -prefix "My-Tasks" so all links (CSS, images) work
+          claat export -prefix "My-Tasks" codelab/codelab.md
+          
+          # The output folder name is unchanged, it comes from the 'id'
           mv my-tasks-github-actions-codelab dist
 
       - name: Upload artifact
