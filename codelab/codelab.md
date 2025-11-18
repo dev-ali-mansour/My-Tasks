@@ -6,7 +6,7 @@ author: Ali Mansour
 lastupdated: 2025-11-24
 status: Published
 analyticsAccount: ""
-home: /My-Tasks/
+home: https://dev-ali-mansour.github.io/My-Tasks/
 
 # Ship it Faster 🚀 Android CI/CD with GitHub Actions
 
