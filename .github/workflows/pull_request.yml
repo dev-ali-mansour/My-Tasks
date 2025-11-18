@@ -1,22 +1,28 @@
 name: Run tests
 run-name: Run test - ${{ github.head_ref }}
 
-# TODO: [1] Configure the trigger of this action to only run on pull requests to main
+# TODO: [1] Configure the trigger of this action to only run on pull requests to main or develop
 
 jobs:
   validate_pr_sources:
-    # TODO: [2] Configure the runner of this job to the latest Ubuntu version
+    runs-on: ubuntu-latest
     steps:
       - name: Validate source branch
         id: source_check
         run: |
           echo "Source branch is: ${{ github.head_ref }}"
-          # Allow only branches matching release/<major>.<minor>.<patch> or hotfix/<major>.<minor>.<patch>
-          if [[ "${{ github.head_ref }}" =~ ^(release|hotfix)/[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "✅ Pull request source is a valid release/hotfix branch."
+          # Only enforce naming rules when PR targets the main branch
+          if [[ "${{ github.base_ref }}" == "main" ]]; then
+            echo "Validating source branch for PR to main..."
+            # Allow only branches matching release/<major>.<minor>.<patch> or hotfix/<major>.<minor>.<patch>
+            if [[ "${{ github.head_ref }}" =~ ^(release|hotfix)/[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "✅ Pull request source is a valid release/hotfix branch."
+            else
+              echo "::error::❌ PRs to main are only allowed from release/x.y.z or hotfix/x.y.z branches (e.g., release/1.2.3 or hotfix/1.2.3). Got: ${{ github.head_ref }}"
+              exit 1
+            fi
           else
-            echo "::error::❌ PRs to main are only allowed from release/x.y.z or hotfix/x.y.z branches (e.g., release/1.2.3 or hotfix/1.2.3). Got: ${{ github.head_ref }}"
-            exit 1
+            echo "Skipping source branch validation because target branch is not main."
           fi
 
   run-tests:
