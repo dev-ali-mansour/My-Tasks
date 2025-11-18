@@ -1,14 +1,16 @@
 # My Tasks
 
-A modern Android task management app built with Kotlin, Jetpack Compose, and a clean architecture approach. It demonstrates best practices around state-driven UIs, Kotlin coroutines and flows, Room persistence, and dependency injection with Koin.
+A modern Android task management app built with Kotlin, Jetpack Compose, and a clean architecture
+approach. It demonstrates best practices around state-driven UIs, Kotlin coroutines and flows, Room
+persistence, and dependency injection with Koin.
 
 ## Screenshots
 
 <p>
-  <img src="images/1.webp" width="200" alt="Screenshot 1"/>
-  <img src="images/2.webp" width="200" alt="Screenshot 2"/>
-  <img src="images/3.webp" width="200" alt="Screenshot 3"/>
-  <img src="images/4.webp" width="200" alt="Screenshot 4"/>
+  <img src="/codelab/images/1.webp" width="200" alt="Screenshot 1"/>
+  <img src="/codelab/images/2.webp" width="200" alt="Screenshot 2"/>
+  <img src="/codelab/images/3.webp" width="200" alt="Screenshot 3"/>
+  <img src="/codelab/images/4.webp" width="200" alt="Screenshot 4"/>
 </p>
 
 ## Features
@@ -25,24 +27,29 @@ A modern Android task management app built with Kotlin, Jetpack Compose, and a c
 ## Tech Stack
 
 **Language & Runtime**
+
 - Kotlin
 - Coroutines & Flows
 
 **Android & Jetpack**
+
 - Jetpack Compose UI
 - Navigation-Compose
 - ViewModel / Lifecycle
 - Room for local data storage
 
 **Architecture**
+
 - Clean-ish layered architecture:
-  - `core/domain`: use cases and domain models
-  - `core/data`: repositories and Room entities/DAOs
-  - `core/ui`: shared UI components, theme, and helper functions
-  - `feature/*`: UI + ViewModels per feature (home, task details, new task, update task)
-  - Unidirectional data flow using Model-View-Intent (MVI): `Event -> ViewModel -> State/Effect -> UI`
+    - `core/domain`: use cases and domain models
+    - `core/data`: repositories and Room entities/DAOs
+    - `core/ui`: shared UI components, theme, and helper functions
+    - `feature/*`: UI + ViewModels per feature (home, task details, new task, update task)
+    - Unidirectional data flow using Model-View-Intent (MVI):
+      `Event -> ViewModel -> State/Effect -> UI`
 
 **Dependency Injection & Tools**
+
 - Koin (with KSP for DI code generation)
 - JUnit 5
 - MockK
@@ -80,7 +87,9 @@ My-Tasks/
 - Android Studio Giraffe or newer
 - Gradle wrapper (provided in the repo)
 
-> Note: Newer Java versions (e.g., 25) may not be fully supported by the Kotlin/Gradle toolchain used here. If you see errors like `java.lang.IllegalArgumentException: 25.0.1`, run Gradle with JDK 21.
+> Note: Newer Java versions (e.g., 25) may not be fully supported by the Kotlin/Gradle toolchain
+> used here. If you see errors like `java.lang.IllegalArgumentException: 25.0.1`, run Gradle with JDK
+21.
 
 ## Getting Started
 
@@ -98,7 +107,8 @@ cd My-Tasks
 
 #### Setting up GitHub Secrets
 
-To enable the automated workflows (Pull Request checks and Google Play deployment), you need to configure the following secrets in your repository settings:
+To enable the automated workflows (Pull Request checks and Google Play deployment), you need to
+configure the following secrets in your repository settings:
 
 1. Go to your forked repository on GitHub
 2. Navigate to **Settings** → **Secrets and variables** → **Actions**
@@ -129,11 +139,13 @@ base64 -w 0 release-key.jks > keystore-base64.txt
 
 **Setting up Google Play Service Account:**
 
-1. Follow this tutorial to [create a Google Play service account](https://medium.com/automating-react-native-app-release-to-google-play/create-google-play-service-account-68471d4b398b)
+1. Follow this tutorial
+   to [create a Google Play service account](https://medium.com/automating-react-native-app-release-to-google-play/create-google-play-service-account-68471d4b398b)
 2. Download the JSON key file
 3. Copy the entire JSON content and paste it as `GOOGLE_PLAY_AUTH_JSON` secret
 
-> **Note:** The release workflow will only trigger when you push a tag (e.g., `v1.0.0`). The pull request workflow runs automatically on PRs to `main` or `develop` branches.
+> **Note:** The release workflow will only trigger when you push a tag (e.g., `v1.0.0`). The pull
+> request workflow runs automatically on PRs to `main` or `develop` branches.
 
 ### 2. Clone the repository (Simple setup)
 
@@ -249,5 +261,6 @@ A clean rebuild can often resolve stale generated code:
 
 ## License
 
-This project is provided as-is for learning and demonstration purposes. Adapt licensing as needed for your use case.
+This project is provided as-is for learning and demonstration purposes. Adapt licensing as needed
+for your use case.
 
