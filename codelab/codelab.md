@@ -257,7 +257,7 @@ run-name: Run test - ${{ github.head_ref }}
 
 jobs:
   validate_pr_sources:
-    runs-on: ubuntu-latest
+    # TODO: [2] Configure the runner of this job to the latest Ubuntu version
     steps:
       - name: Validate source branch
         id: source_check
@@ -554,7 +554,7 @@ jobs:
 
 ### Resources:
 
-[Android Docs](https://developer.android.com/develop)
-[GitHub Actions Docs](https://docs.github.com/en/actions)
-[Test-driven development for Android](https://www.youtube.com/playlist?list=PLdqCqcIH93jv0B2gXT-X7LdnFXOs2vEVF)
-[]()
+- [Android Docs](https://developer.android.com/develop)
+- [GitHub Actions Docs](https://docs.github.com/en/actions)
+- [Test-driven development for Android](https://www.youtube.com/playlist?list=PLdqCqcIH93jv0B2gXT-X7LdnFXOs2vEVF)
+- []()
