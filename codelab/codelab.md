@@ -17,6 +17,18 @@ home: https://dev-ali-mansour.github.io/My-Tasks/
 
 Duration: 4:00
 
+### About this codelab
+
+**Last Updated:** November 24, 2025
+
+**Author:** Ali Mansour
+
+**Source:** [GitHub Repository](https://github.com/dev-ali-mansour/My-Tasks)
+
+**Feedback:** [Submit Issues](https://github.com/dev-ali-mansour/My-Tasks/issues)
+
+---
+
 Continuous Integration (CI) is a fundamental practice in modern software development. For an Android app like "My-Tasks," a CI workflow can automatically build and test your code every time you open a pull request, ensuring that new changes don't break existing functionality.
 
 This codelab will guide you through completing a "skeleton" GitHub Actions workflow file. You will implement the `TODO` items to build a complete, functioning CI pipeline.
