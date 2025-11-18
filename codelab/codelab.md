@@ -6,14 +6,13 @@ author: Ali Mansour
 lastupdated: 2025-11-24
 status: Published
 analyticsAccount: ""
-duration: 60
 ---
 
 # Ship it Faster 🚀 Android CI/CD with GitHub Actions
 
 ## Introduction
 
-Duration: 4
+Duration: 4:00
 
 Continuous Integration (CI) is a fundamental practice in modern software development. For an Android app like "My-Tasks," a CI workflow can automatically build and test your code every time you open a pull request, ensuring that new changes don't break existing functionality.
 
@@ -22,10 +21,10 @@ This codelab will guide you through completing a "skeleton" GitHub Actions workf
 The application we are working on named `My Tasks`
 
 <p>
-  <img src="images/1.webp" width="300" alt="Screenshot 1"/>
-  <img src="images/2.webp" width="300" alt="Screenshot 2"/><br/>
-  <img src="images/3.webp" width="300" alt="Screenshot 3"/>
-  <img src="images/4.webp" width="300" alt="Screenshot 4"/><br/>
+  <img src="../images/1.webp" width="300" alt="Screenshot 1"/>
+  <img src="../images/2.webp" width="300" alt="Screenshot 2"/><br/>
+  <img src="../images/3.webp" width="300" alt="Screenshot 3"/>
+  <img src="../images/4.webp" width="300" alt="Screenshot 4"/><br/>
 </p>
 
 ### 📌 What you'll build
