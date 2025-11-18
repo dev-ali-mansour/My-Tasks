@@ -1,11 +1,14 @@
 id: my-tasks-github-actions-codelab
 summary: "In this codelab, you’ll complete a GitHub Actions workflow for the My-Tasks Android app."
-category: Android, CI/CD, GitHub Actions
-environment: web
-author: Ali Mansour
-lastupdated: 2025-11-24
+authors: Ali Mansour
+updated: 2025-11-24
 status: Published
-analyticsAccount: ""
+categories: android, ci-cd, github-actions
+tags: android, github-actions, ci-cd, compose
+environments: web
+source: https://github.com/dev-ali-mansour/My-Tasks
+feedback link: https://github.com/dev-ali-mansour/My-Tasks/issues
+analytics account: ""
 home: https://dev-ali-mansour.github.io/My-Tasks/
 
 # Ship it Faster 🚀 Android CI/CD with GitHub Actions
