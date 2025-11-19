@@ -12,6 +12,7 @@ import org.koin.core.annotation.Single
 @Module(includes = [ RoomModule::class])
 @ComponentScan
 class UseCaseModule {
+
     @Single
     fun provideAddTaskUseCase(repository: TasksRepository) = AddTaskUseCase(repository)
 
