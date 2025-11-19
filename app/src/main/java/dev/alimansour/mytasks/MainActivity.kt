@@ -9,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import dev.alimansour.mytasks.core.ui.theme.MyTasksTheme
+import dev.alimansour.mytasks.core.ui.view.DebugCheckerBanner
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -36,6 +37,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             MyTasksTheme {
                 MainApp()
+                if (BuildConfig.DEBUG) {
+                    DebugCheckerBanner()
+                }
             }
         }
     }
