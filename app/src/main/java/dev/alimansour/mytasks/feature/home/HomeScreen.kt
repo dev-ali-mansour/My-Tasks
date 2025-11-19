@@ -1,5 +1,7 @@
 package dev.alimansour.mytasks.feature.home
 
+import android.content.Context
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,11 +33,14 @@ import dev.alimansour.mytasks.R
 import dev.alimansour.mytasks.core.domain.model.Task
 import dev.alimansour.mytasks.core.ui.common.LaunchedUiEffectHandler
 import dev.alimansour.mytasks.core.ui.navigation.Route
-import dev.alimansour.mytasks.core.ui.utils.UiText
 import dev.alimansour.mytasks.core.ui.theme.MyTasksTheme
 import dev.alimansour.mytasks.core.ui.theme.interFamily
+import dev.alimansour.mytasks.core.ui.utils.UiText
+import dev.alimansour.mytasks.core.ui.utils.activity
+import dev.alimansour.mytasks.core.ui.view.ConfirmDialog
 import org.koin.androidx.compose.koinViewModel
 import java.util.concurrent.TimeUnit
+import kotlin.system.exitProcess
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,6 +54,11 @@ fun HomeScreen(
 ) {
     val viewModel: HomeViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context: Context = LocalContext.current
+
+    BackHandler {
+        viewModel.processEvent(HomeEvent.OnBackPress)
+    }
 
     LaunchedEffect(Unit) {
         onSetTopBar {
@@ -100,14 +111,35 @@ fun HomeScreen(
             when (effect) {
                 is HomeEffect.NavigateToRoute -> navigateToRoute(effect.route)
                 is HomeEffect.NavigateToTaskDetails -> navigateToTaskDetails(effect.task)
-                is HomeEffect.ShowError -> {
-                    showError(effect.message)
+                is HomeEffect.ShowError -> showError(effect.message)
+                is HomeEffect.ExitApp -> {
+                    (context.activity).finishAffinity()
+                    exitProcess(status = 0)
                 }
             }
         },
     )
 
-    HomeContent(uiState = uiState, onEvent = viewModel::processEvent)
+    if (uiState.openDialog) {
+        ConfirmDialog(
+            title = stringResource(id = R.string.exit),
+            message = stringResource(id = R.string.exit_dialog_message),
+            onDismissRequest = {
+                viewModel.processEvent(HomeEvent.OnExitDialogCancelled)
+            },
+            onConfirmed = {
+                viewModel.processEvent(HomeEvent.OnExitDialogConfirmed)
+            },
+            onCancelled = {
+                viewModel.processEvent(HomeEvent.OnExitDialogCancelled)
+            },
+        )
+    }
+
+    HomeContent(
+        uiState = uiState,
+        onEvent = viewModel::processEvent
+    )
 }
 
 @Composable
