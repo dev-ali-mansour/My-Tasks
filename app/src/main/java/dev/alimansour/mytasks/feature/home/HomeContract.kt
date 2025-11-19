@@ -9,6 +9,7 @@ import dev.alimansour.mytasks.core.ui.utils.UiText
 data class HomeState(
     val isLoading: Boolean = false,
     val isFabExpanded: Boolean = false,
+    val openDialog: Boolean = false,
     val tasks: List<Task> = emptyList(),
     val effect: HomeEffect? = null,
 )
@@ -25,12 +26,20 @@ sealed interface HomeEffect {
     data class ShowError(
         val message: UiText,
     ) : HomeEffect
+
+    object ExitApp : HomeEffect
 }
 
 sealed interface HomeEvent {
     data class OnExpandStateChanged(
         val isExpanded: Boolean,
     ) : HomeEvent
+
+    object OnBackPress : HomeEvent
+
+    object OnExitDialogConfirmed : HomeEvent
+
+    object OnExitDialogCancelled : HomeEvent
 
     object NavigateToNewTaskScreen : HomeEvent
 

@@ -46,6 +46,25 @@ class HomeViewModel(
                 _uiState.update {
                     it.copy(isFabExpanded = event.isExpanded)
                 }
+
+            is HomeEvent.OnBackPress ->
+                _uiState.update {
+                    it.copy(openDialog = true)
+                }
+
+            is HomeEvent.OnExitDialogConfirmed -> {
+                _uiState.update {
+                    it.copy(openDialog = false, effect = HomeEffect.ExitApp)
+                }
+
+            }
+
+            is HomeEvent.OnExitDialogCancelled ->
+                _uiState.update {
+                    it.copy(openDialog = false)
+                }
+
+
             is HomeEvent.NavigateToNewTaskScreen ->
                 _uiState.update {
                     it.copy(effect = NavigateToRoute(route = Route.NewTask))
