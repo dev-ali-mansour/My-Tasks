@@ -11,7 +11,6 @@ coroutine = "1.10.2"
 androidxLifecycle = "2.10.0"
 constrainLayout = "1.1.1"
 androidxNavigation = "2.9.7"
-multidex = "2.0.1"
 timber = "5.0.1"
 koinBom = "4.1.1"
 koinAnnotations = "2.3.1"
@@ -40,7 +39,6 @@ androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayo
 androidx-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "androidxNavigation" }
 androidx-lifecycle-runtimeCompose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidxLifecycle" }
 androidx-lifecycle-viewModelCompose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidxLifecycle" }
-multidex = { module = "androidx.multidex:multidex", version.ref = "multidex" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutine" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutine" }
