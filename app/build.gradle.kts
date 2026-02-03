@@ -204,7 +204,6 @@ dependencies {
     implementation(libs.splashScreen)
     implementation(libs.androidx.lifecycle.runtimeCompose)
     implementation(libs.androidx.lifecycle.viewModelCompose)
-    implementation(libs.multidex)
     implementation(libs.timber)
     implementation(libs.coroutines.core)
     implementation(platform(libs.koin.bom))
