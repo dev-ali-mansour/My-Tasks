@@ -26,6 +26,8 @@ import org.koin.androidx.compose.koinViewModel
 fun AppNavHost(
     modifier: Modifier = Modifier,
     selectedTaskViewModel: SelectedTaskViewModel = koinViewModel(),
+    onSetTopBar: (@Composable () -> Unit) -> Unit,
+    onSetFab: (@Composable () -> Unit) -> Unit,
     onSuccess: (message: UiText) -> Unit,
     showError: (message: UiText) -> Unit,
 ) {
@@ -45,6 +47,8 @@ fun AppNavHost(
                     selectedTaskViewModel.onSelectTask(it)
                     navController.navigate(Route.TaskDetails)
                 },
+                onSetTopBar = onSetTopBar,
+                onSetFab = onSetFab,
                 onFabClick = { navController.navigate(Route.NewTask) },
                 showError = showError,
             )
@@ -57,6 +61,8 @@ fun AppNavHost(
                     onSuccess(it)
                     navController.navigateUpSafely()
                 },
+                onSetTopBar = onSetTopBar,
+                onSetFab = onSetFab,
                 showError = showError,
             )
         }
@@ -81,6 +87,8 @@ fun AppNavHost(
                     onSuccess(it)
                     navController.navigateUpSafely()
                 },
+                onSetTopBar = onSetTopBar,
+                onSetFab = onSetFab,
                 showError = showError,
             )
         }
@@ -105,6 +113,8 @@ fun AppNavHost(
                         }
                     }
                 },
+                onSetTopBar = onSetTopBar,
+                onSetFab = onSetFab,
                 showError = showError,
             )
         }
