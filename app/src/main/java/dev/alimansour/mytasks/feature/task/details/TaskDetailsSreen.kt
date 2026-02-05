@@ -37,17 +37,18 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.alimansour.mytasks.R
 import dev.alimansour.mytasks.core.domain.model.Task
 import dev.alimansour.mytasks.core.ui.common.LaunchedUiEffectHandler
+import dev.alimansour.mytasks.core.ui.theme.MyTasksTheme
+import dev.alimansour.mytasks.core.ui.theme.interFamily
 import dev.alimansour.mytasks.core.ui.utils.UiText
 import dev.alimansour.mytasks.core.ui.utils.UiText.StringResourceId
 import dev.alimansour.mytasks.core.ui.utils.getFormattedDate
-import dev.alimansour.mytasks.core.ui.theme.MyTasksTheme
-import dev.alimansour.mytasks.core.ui.theme.interFamily
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskDetailsScreen(
     modifier: Modifier = Modifier,
+    viewModel: TaskDetailsViewModel = koinViewModel(),
     onNavigationIconClicked: () -> Unit,
     onUpdateTaskClicked: (Task) -> Unit,
     onSuccess: (message: UiText) -> Unit,
@@ -55,7 +56,6 @@ fun TaskDetailsScreen(
     onSetFab: (@Composable () -> Unit) -> Unit,
     showError: (message: UiText) -> Unit,
 ) {
-    val viewModel: TaskDetailsViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
@@ -98,8 +98,14 @@ fun TaskDetailsScreen(
         onConsumeEffect = { viewModel.processEvent(TaskDetailsEvent.ConsumeEffect) },
         onEffect = { effect ->
             when (effect) {
-                is TaskDetailsEffect.NavigateToUpdateScreen -> onUpdateTaskClicked(effect.task)
-                is TaskDetailsEffect.ShowSuccess -> onSuccess(StringResourceId(R.string.task_updated_success))
+                is TaskDetailsEffect.NavigateToUpdateScreen -> {
+                    onUpdateTaskClicked(effect.task)
+                }
+
+                is TaskDetailsEffect.ShowSuccess -> {
+                    onSuccess(StringResourceId(R.string.task_updated_success))
+                }
+
                 is TaskDetailsEffect.ShowError -> {
                     showError(effect.message)
                 }

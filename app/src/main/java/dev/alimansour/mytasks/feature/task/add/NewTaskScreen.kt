@@ -49,26 +49,26 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.alimansour.mytasks.R
 import dev.alimansour.mytasks.core.ui.common.LaunchedUiEffectHandler
+import dev.alimansour.mytasks.core.ui.theme.MyTasksTheme
+import dev.alimansour.mytasks.core.ui.theme.interFamily
 import dev.alimansour.mytasks.core.ui.utils.UiText
 import dev.alimansour.mytasks.core.ui.utils.getFormattedDate
 import dev.alimansour.mytasks.feature.task.NewTaskEvent
 import dev.alimansour.mytasks.feature.task.TaskEffect
 import dev.alimansour.mytasks.feature.task.TaskState
-import dev.alimansour.mytasks.core.ui.theme.MyTasksTheme
-import dev.alimansour.mytasks.core.ui.theme.interFamily
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewTaskScreen(
     modifier: Modifier = Modifier,
+    viewModel: NewTaskViewModel = koinViewModel(),
     onNavigationIconClicked: () -> Unit,
     onSuccess: (message: UiText) -> Unit,
     onSetTopBar: (@Composable () -> Unit) -> Unit,
     onSetFab: (@Composable () -> Unit) -> Unit,
     showError: (message: UiText) -> Unit,
 ) {
-    val viewModel: NewTaskViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
@@ -111,7 +111,10 @@ fun NewTaskScreen(
         onConsumeEffect = { viewModel.processEvent(NewTaskEvent.ConsumeEffect) },
         onEffect = { effect ->
             when (effect) {
-                is TaskEffect.ShowSuccess -> onSuccess(UiText.StringResourceId(R.string.task_add_success))
+                is TaskEffect.ShowSuccess -> {
+                    onSuccess(UiText.StringResourceId(R.string.task_add_success))
+                }
+
                 is TaskEffect.ShowError -> {
                     showError(effect.message)
                 }

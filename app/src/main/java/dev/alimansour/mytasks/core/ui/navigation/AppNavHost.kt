@@ -24,14 +24,14 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun AppNavHost(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
+    selectedTaskViewModel: SelectedTaskViewModel = koinViewModel(),
     onSetTopBar: (@Composable () -> Unit) -> Unit,
     onSetFab: (@Composable () -> Unit) -> Unit,
     onSuccess: (message: UiText) -> Unit,
     showError: (message: UiText) -> Unit,
 ) {
     val navController = rememberNavController()
-    val selectedTaskViewModel: SelectedTaskViewModel = koinViewModel()
 
     NavHost(
         navController = navController,

@@ -1,5 +1,6 @@
 package dev.alimansour.mytasks.feature.task.details
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.alimansour.mytasks.core.domain.model.Task
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 
+@Stable
 @KoinViewModel
 class TaskDetailsViewModel(
     private val dispatcher: CoroutineDispatcher,

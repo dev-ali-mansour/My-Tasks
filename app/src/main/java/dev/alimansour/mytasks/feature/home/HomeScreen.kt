@@ -30,15 +30,16 @@ import dev.alimansour.mytasks.R
 import dev.alimansour.mytasks.core.domain.model.Task
 import dev.alimansour.mytasks.core.ui.common.LaunchedUiEffectHandler
 import dev.alimansour.mytasks.core.ui.navigation.Route
-import dev.alimansour.mytasks.core.ui.utils.UiText
 import dev.alimansour.mytasks.core.ui.theme.MyTasksTheme
 import dev.alimansour.mytasks.core.ui.theme.interFamily
+import dev.alimansour.mytasks.core.ui.utils.UiText
 import org.koin.androidx.compose.koinViewModel
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    viewModel: HomeViewModel = koinViewModel(),
     navigateToRoute: (Route) -> Unit,
     navigateToTaskDetails: (Task) -> Unit,
     onSetTopBar: (@Composable () -> Unit) -> Unit,
@@ -46,7 +47,6 @@ fun HomeScreen(
     onFabClick: () -> Unit,
     showError: (message: UiText) -> Unit,
 ) {
-    val viewModel: HomeViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
@@ -98,8 +98,14 @@ fun HomeScreen(
         onConsumeEffect = { viewModel.processEvent(HomeEvent.ConsumeEffect) },
         onEffect = { effect ->
             when (effect) {
-                is HomeEffect.NavigateToRoute -> navigateToRoute(effect.route)
-                is HomeEffect.NavigateToTaskDetails -> navigateToTaskDetails(effect.task)
+                is HomeEffect.NavigateToRoute -> {
+                    navigateToRoute(effect.route)
+                }
+
+                is HomeEffect.NavigateToTaskDetails -> {
+                    navigateToTaskDetails(effect.task)
+                }
+
                 is HomeEffect.ShowError -> {
                     showError(effect.message)
                 }
