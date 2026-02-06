@@ -17,21 +17,18 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,6 +45,7 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.alimansour.mytasks.R
+import dev.alimansour.mytasks.core.ui.common.CommonTopAppBar
 import dev.alimansour.mytasks.core.ui.common.LaunchedUiEffectHandler
 import dev.alimansour.mytasks.core.ui.theme.MyTasksTheme
 import dev.alimansour.mytasks.core.ui.theme.interFamily
@@ -58,53 +56,15 @@ import dev.alimansour.mytasks.feature.task.TaskEffect
 import dev.alimansour.mytasks.feature.task.TaskState
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewTaskScreen(
     modifier: Modifier = Modifier,
     viewModel: NewTaskViewModel = koinViewModel(),
     onNavigationIconClicked: () -> Unit,
     onSuccess: (message: UiText) -> Unit,
-    onSetTopBar: (@Composable () -> Unit) -> Unit,
-    onSetFab: (@Composable () -> Unit) -> Unit,
     showError: (message: UiText) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    LaunchedEffect(Unit) {
-        onSetTopBar {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(id = R.string.new_task),
-                        color = MaterialTheme.colorScheme.onSurface,
-                        style =
-                            MaterialTheme.typography.headlineSmall.copy(
-                                fontFamily = interFamily,
-                                fontWeight = FontWeight.Bold,
-                            ),
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigationIconClicked) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_close),
-                            contentDescription = stringResource(R.string.close),
-                            tint = MaterialTheme.colorScheme.onSurface,
-                        )
-                    }
-                },
-                colors =
-                    TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.Transparent,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                        actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                    ),
-            )
-        }
-        onSetFab {}
-    }
 
     LaunchedUiEffectHandler(
         viewModel.effect,
@@ -122,7 +82,15 @@ fun NewTaskScreen(
         },
     )
 
-    NewTaskContent(modifier = modifier, uiState = uiState, onEvent = viewModel::processEvent)
+    Scaffold(topBar = {
+        CommonTopAppBar(
+            title = stringResource(id = R.string.new_task),
+            onNavigationIconClicked = onNavigationIconClicked,
+        )
+    }) { innerPadding ->
+
+        NewTaskContent(modifier = modifier.padding(innerPadding), uiState = uiState, onEvent = viewModel::processEvent)
+    }
 }
 
 @Composable
