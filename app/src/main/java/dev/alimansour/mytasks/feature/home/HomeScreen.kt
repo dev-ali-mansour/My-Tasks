@@ -1,5 +1,7 @@
 package dev.alimansour.mytasks.feature.home
 
+import android.content.Context
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -32,6 +34,7 @@ import dev.alimansour.mytasks.core.ui.theme.MyTasksTheme
 import dev.alimansour.mytasks.core.ui.utils.UiText
 import org.koin.androidx.compose.koinViewModel
 import java.util.concurrent.TimeUnit
+import kotlin.system.exitProcess
 
 @Composable
 fun HomeScreen(
@@ -42,6 +45,11 @@ fun HomeScreen(
     showError: (message: UiText) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context: Context = LocalContext.current
+
+    BackHandler {
+        viewModel.processEvent(HomeEvent.OnBackPress)
+    }
 
     LaunchedUiEffectHandler(
         viewModel.effect,

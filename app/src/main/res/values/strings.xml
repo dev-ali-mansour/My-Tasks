@@ -40,5 +40,7 @@
         <item quantity="one">Due %1$d day ago</item>
         <item quantity="other">Due %1$d days ago</item>
     </plurals>
+    <string name="exit">Exit</string>
+    <string name="exit_dialog_message">Are you sure you want to exit the application?</string>
 </resources>
 
