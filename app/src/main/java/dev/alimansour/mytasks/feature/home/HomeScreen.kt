@@ -19,6 +19,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -32,6 +33,7 @@ import dev.alimansour.mytasks.core.ui.common.LaunchedUiEffectHandler
 import dev.alimansour.mytasks.core.ui.navigation.Route
 import dev.alimansour.mytasks.core.ui.theme.MyTasksTheme
 import dev.alimansour.mytasks.core.ui.utils.UiText
+import dev.alimansour.mytasks.core.ui.utils.activity
 import org.koin.androidx.compose.koinViewModel
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
@@ -66,6 +68,11 @@ fun HomeScreen(
 
                 is HomeEffect.ShowError -> {
                     showError(effect.message)
+                }
+
+                is HomeEffect.ExitApp -> {
+                    (context.activity).finishAffinity()
+                    exitProcess(status = 0)
                 }
             }
         },
