@@ -3,56 +3,49 @@ package dev.alimansour.mytasks.feature.home
 import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.alimansour.mytasks.R
 import dev.alimansour.mytasks.core.domain.model.Task
+import dev.alimansour.mytasks.core.ui.common.CommonTopAppBar
 import dev.alimansour.mytasks.core.ui.common.LaunchedUiEffectHandler
 import dev.alimansour.mytasks.core.ui.navigation.Route
 import dev.alimansour.mytasks.core.ui.theme.MyTasksTheme
-import dev.alimansour.mytasks.core.ui.theme.interFamily
 import dev.alimansour.mytasks.core.ui.utils.UiText
 import dev.alimansour.mytasks.core.ui.utils.activity
-import dev.alimansour.mytasks.core.ui.view.ConfirmDialog
 import org.koin.androidx.compose.koinViewModel
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    viewModel: HomeViewModel = koinViewModel(),
     navigateToRoute: (Route) -> Unit,
     navigateToTaskDetails: (Task) -> Unit,
-    onSetTopBar: (@Composable () -> Unit) -> Unit,
-    onSetFab: (@Composable () -> Unit) -> Unit,
     onFabClick: () -> Unit,
     showError: (message: UiText) -> Unit,
 ) {
-    val viewModel: HomeViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context: Context = LocalContext.current
 
@@ -60,58 +53,23 @@ fun HomeScreen(
         viewModel.processEvent(HomeEvent.OnBackPress)
     }
 
-    LaunchedEffect(Unit) {
-        onSetTopBar {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(id = R.string.app_name),
-                        color = MaterialTheme.colorScheme.onSurface,
-                        style =
-                            MaterialTheme.typography.headlineSmall.copy(
-                                fontFamily = interFamily,
-                                fontWeight = FontWeight.Bold,
-                            ),
-                    )
-                },
-                colors =
-                    TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.Transparent,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                        actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                    ),
-            )
-        }
-    }
-
-    LaunchedEffect(uiState.isFabExpanded) {
-        onSetFab {
-            ExtendedFloatingActionButton(
-                onClick = { onFabClick() },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                shape = RoundedCornerShape(16.dp),
-                expanded = uiState.isFabExpanded,
-                text = { Text(text = "Add task") },
-                icon = {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_add),
-                        contentDescription = "Add task",
-                    )
-                },
-            )
-        }
-    }
-
     LaunchedUiEffectHandler(
         viewModel.effect,
         onConsumeEffect = { viewModel.processEvent(HomeEvent.ConsumeEffect) },
         onEffect = { effect ->
             when (effect) {
-                is HomeEffect.NavigateToRoute -> navigateToRoute(effect.route)
-                is HomeEffect.NavigateToTaskDetails -> navigateToTaskDetails(effect.task)
-                is HomeEffect.ShowError -> showError(effect.message)
+                is HomeEffect.NavigateToRoute -> {
+                    navigateToRoute(effect.route)
+                }
+
+                is HomeEffect.NavigateToTaskDetails -> {
+                    navigateToTaskDetails(effect.task)
+                }
+
+                is HomeEffect.ShowError -> {
+                    showError(effect.message)
+                }
+
                 is HomeEffect.ExitApp -> {
                     (context.activity).finishAffinity()
                     exitProcess(status = 0)
@@ -120,31 +78,39 @@ fun HomeScreen(
         },
     )
 
-    if (uiState.openDialog) {
-        ConfirmDialog(
-            title = stringResource(id = R.string.exit),
-            message = stringResource(id = R.string.exit_dialog_message),
-            onDismissRequest = {
-                viewModel.processEvent(HomeEvent.OnExitDialogCancelled)
-            },
-            onConfirmed = {
-                viewModel.processEvent(HomeEvent.OnExitDialogConfirmed)
-            },
-            onCancelled = {
-                viewModel.processEvent(HomeEvent.OnExitDialogCancelled)
-            },
+    Scaffold(
+        topBar = {
+            CommonTopAppBar(title = stringResource(id = R.string.app_name), showBackIcon = false) { }
+        },
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                onClick = { onFabClick() },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                shape = RoundedCornerShape(16.dp),
+                expanded = uiState.isFabExpanded,
+                text = { Text(text = stringResource(R.string.add_task)) },
+                icon = {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_add),
+                        contentDescription = stringResource(R.string.add_task),
+                    )
+                },
+            )
+        },
+    ) { paddingValues ->
+        HomeContent(
+            uiState = uiState,
+            modifier = Modifier.padding(paddingValues),
+            onEvent = viewModel::processEvent,
         )
     }
-
-    HomeContent(
-        uiState = uiState,
-        onEvent = viewModel::processEvent
-    )
 }
 
 @Composable
 private fun HomeContent(
     uiState: HomeState,
+    modifier: Modifier = Modifier,
     onEvent: (HomeEvent) -> Unit,
 ) {
     val listState = rememberLazyListState()
@@ -159,7 +125,7 @@ private fun HomeContent(
     }
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         state = listState,
     ) {
         items(uiState.tasks, key = { task ->

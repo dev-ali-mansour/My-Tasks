@@ -1,5 +1,6 @@
 package dev.alimansour.mytasks.feature.home
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.alimansour.mytasks.core.domain.model.Task
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 
+@Stable
 @KoinViewModel
 class HomeViewModel(
     private val dispatcher: CoroutineDispatcher,
@@ -42,45 +44,50 @@ class HomeViewModel(
 
     fun processEvent(event: HomeEvent) {
         when (event) {
-            is HomeEvent.OnExpandStateChanged ->
+            is HomeEvent.OnExpandStateChanged -> {
                 _uiState.update {
                     it.copy(isFabExpanded = event.isExpanded)
                 }
+            }
 
-            is HomeEvent.OnBackPress ->
+            is HomeEvent.OnBackPress -> {
                 _uiState.update {
                     it.copy(openDialog = true)
                 }
+            }
 
             is HomeEvent.OnExitDialogConfirmed -> {
                 _uiState.update {
                     it.copy(openDialog = false, effect = HomeEffect.ExitApp)
                 }
-
             }
 
-            is HomeEvent.OnExitDialogCancelled ->
+            is HomeEvent.OnExitDialogCancelled -> {
                 _uiState.update {
                     it.copy(openDialog = false)
                 }
+            }
 
-
-            is HomeEvent.NavigateToNewTaskScreen ->
+            is HomeEvent.NavigateToNewTaskScreen -> {
                 _uiState.update {
                     it.copy(effect = NavigateToRoute(route = Route.NewTask))
                 }
+            }
 
-            is HomeEvent.NavigateToTaskDetailsScreen ->
+            is HomeEvent.NavigateToTaskDetailsScreen -> {
                 _uiState.update {
                     it.copy(effect = HomeEffect.NavigateToTaskDetails(task = event.task))
                 }
+            }
 
             is HomeEvent.OnTaskCheckChanged -> {
                 updateTaskJob?.cancel()
                 updateTaskJob = updateTask(event.task)
             }
 
-            is HomeEvent.ConsumeEffect -> _uiState.update { it.copy(effect = null) }
+            is HomeEvent.ConsumeEffect -> {
+                _uiState.update { it.copy(effect = null) }
+            }
         }
     }
 
