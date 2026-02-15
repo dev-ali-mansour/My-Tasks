@@ -1,7 +1,5 @@
 package dev.alimansour.mytasks.feature.home
 
-import android.content.Context
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -47,11 +45,7 @@ fun HomeScreen(
     showError: (message: UiText) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val context: Context = LocalContext.current
-
-    BackHandler {
-        viewModel.processEvent(HomeEvent.OnBackPress)
-    }
+    val context = LocalContext.current
 
     LaunchedUiEffectHandler(
         viewModel.effect,
