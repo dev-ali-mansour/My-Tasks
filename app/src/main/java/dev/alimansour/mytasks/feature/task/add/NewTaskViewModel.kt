@@ -1,5 +1,6 @@
 package dev.alimansour.mytasks.feature.task.add
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.alimansour.mytasks.R
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 
+@Stable
 @KoinViewModel
 class NewTaskViewModel(
     private val dispatcher: CoroutineDispatcher,
@@ -40,34 +42,39 @@ class NewTaskViewModel(
 
     fun processEvent(event: NewTaskEvent) {
         when (event) {
-            is NewTaskEvent.UpdateTitle ->
+            is NewTaskEvent.UpdateTitle -> {
                 _uiState.update { it.copy(title = event.title) }
+            }
 
-            is NewTaskEvent.UpdateDescription ->
+            is NewTaskEvent.UpdateDescription -> {
                 _uiState.update { it.copy(description = event.description) }
+            }
 
-            is NewTaskEvent.UpdateDueDate ->
+            is NewTaskEvent.UpdateDueDate -> {
                 _uiState.update {
                     it.copy(dueDate = event.dueDate)
                 }
+            }
 
             is NewTaskEvent.Proceed -> {
                 when {
-                    uiState.value.title.isBlank() ->
+                    uiState.value.title.isBlank() -> {
                         _uiState.update {
                             it.copy(
                                 effect =
                                     TaskEffect.ShowError(message = UiText.StringResourceId(R.string.title_cannot_be_empty)),
                             )
                         }
+                    }
 
-                    uiState.value.description.isBlank() ->
+                    uiState.value.description.isBlank() -> {
                         _uiState.update {
                             it.copy(
                                 effect =
                                     TaskEffect.ShowError(message = UiText.StringResourceId(R.string.description_cannot_be_empty)),
                             )
                         }
+                    }
 
                     else -> {
                         addTaskJob?.cancel()
@@ -76,7 +83,9 @@ class NewTaskViewModel(
                 }
             }
 
-            is NewTaskEvent.ConsumeEffect -> _uiState.update { it.copy(effect = null) }
+            is NewTaskEvent.ConsumeEffect -> {
+                _uiState.update { it.copy(effect = null) }
+            }
         }
     }
 
