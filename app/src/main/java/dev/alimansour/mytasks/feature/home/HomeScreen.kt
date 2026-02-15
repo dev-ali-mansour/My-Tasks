@@ -34,6 +34,7 @@ import dev.alimansour.mytasks.core.ui.utils.UiText
 import dev.alimansour.mytasks.core.ui.utils.activity
 import org.koin.androidx.compose.koinViewModel
 import java.util.concurrent.TimeUnit
+import kotlin.system.exitProcess
 
 @Composable
 fun HomeScreen(
@@ -44,6 +45,7 @@ fun HomeScreen(
     showError: (message: UiText) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     LaunchedUiEffectHandler(
         viewModel.effect,
