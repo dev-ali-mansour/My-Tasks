@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.KoinViewModel
 
 @Stable
 @KoinViewModel
@@ -37,8 +37,9 @@ class TaskDetailsViewModel(
 
     fun processEvent(event: TaskDetailsEvent) {
         when (event) {
-            is TaskDetailsEvent.LoadTask ->
+            is TaskDetailsEvent.LoadTask -> {
                 _uiState.update { it.copy(task = event.task) }
+            }
 
             is TaskDetailsEvent.UpdateTask -> {
                 _uiState.value.task?.let { task ->
@@ -55,7 +56,9 @@ class TaskDetailsViewModel(
                 }
             }
 
-            is TaskDetailsEvent.ConsumeEffect -> _uiState.update { it.copy(effect = null) }
+            is TaskDetailsEvent.ConsumeEffect -> {
+                _uiState.update { it.copy(effect = null) }
+            }
         }
     }
 
