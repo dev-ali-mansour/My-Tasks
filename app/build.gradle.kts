@@ -186,9 +186,10 @@ tasks.withType<Test>().configureEach {
     }
 }
 
-ksp {
-    arg("KOIN_DEFAULT_MODULE", "false")
-    arg("KOIN_CONFIG_CHECK", "true")
+junitPlatform {
+    jacocoOptions {
+        taskGenerationEnabled = false
+    }
 }
 
 dependencies {
