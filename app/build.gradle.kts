@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.room)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.koin.compiler)
     alias(libs.plugins.junit5)
     alias(libs.plugins.jacoco)
 }
@@ -209,7 +210,6 @@ dependencies {
     implementation(platform(libs.koin.bom))
     implementation(libs.bundles.koin.core)
     implementation(libs.bundles.koin.android)
-    ksp(libs.koin.ksp.compiler)
     implementation(libs.bundles.room)
     ksp(libs.room.compiler)
     testImplementation(platform(libs.junit.bom))
