@@ -2,7 +2,9 @@ name: AI PR Reviewer
 
 on:
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
+      - develop
 
 jobs:
   build_and_review:
