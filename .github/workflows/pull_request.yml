@@ -91,9 +91,8 @@ jobs:
           echo "" >> ai_summary.txt
           cat pr_diff.txt | python scripts/pr_reviewer.py >> ai_summary.txt
           
-          - name: Post Comment to PR
-          env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # 3. USE --body-file TO SAFELY UPLOAD MULTILINE TEXT
-          run: |
+      - name: Post Comment to PR
+        env:
+         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
           gh pr comment ${{ github.event.pull_request.number }} --body-file ai_summary.txt
