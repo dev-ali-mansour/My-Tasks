@@ -14,6 +14,7 @@ androidxNavigation = "2.9.7"
 timber = "5.0.1"
 koinBom = "4.2.1"
 koinAnnotations = "4.2.1"
+koin-plugin = "0.6.2"
 room = "2.8.4"
 ksp = "2.3.6"
 mockk = "1.14.9"
@@ -49,7 +50,6 @@ koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose" }
 koin-androidx-compose-navigation = { module = "io.insert-koin:koin-androidx-compose-navigation" }
 koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koinAnnotations" }
 koin-androidx-workmanager = { module = "io.insert-koin:koin-androidx-workmanager" }
-koin-ksp-compiler = { module = "io.insert-koin:koin-ksp-compiler", version.ref = "koinAnnotations" }
 room = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
@@ -84,3 +84,4 @@ room = { id = "androidx.room", version.ref = "room" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 junit5 = { id = "de.mannodermaus.android-junit5", version.ref = "androidJunit5Plugin" }
 jacoco = { id = "jacoco" }
+koin-compiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-plugin" }

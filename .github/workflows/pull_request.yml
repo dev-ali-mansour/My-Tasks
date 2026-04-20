@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -59,3 +59,40 @@ jobs:
 
       - name: Run Unit Tests
         run: ./gradlew test
+
+  ai_review:
+    needs: run-tests
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install Gemini SDK
+        run: pip install google-genai
+
+      - name: Generate AI PR Summary
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          git diff origin/${{ github.base_ref }} HEAD > pr_diff.txt
+          
+          # 2. CREATE A FORMATTED FILE INSTEAD OF A BASH VARIABLE
+          echo "🤖 **AI Reviewer Summary:**" > ai_summary.txt
+          echo "" >> ai_summary.txt
+          cat pr_diff.txt | python scripts/pr_reviewer.py >> ai_summary.txt
+          
+      - name: Post Comment to PR
+        env:
+         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body-file ai_summary.txt

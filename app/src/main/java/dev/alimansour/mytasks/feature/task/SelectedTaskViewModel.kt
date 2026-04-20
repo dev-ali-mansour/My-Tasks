@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import dev.alimansour.mytasks.core.domain.model.Task
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.KoinViewModel
 
 @Stable
 @KoinViewModel
