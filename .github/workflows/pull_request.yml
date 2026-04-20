@@ -80,19 +80,28 @@ jobs:
       - name: Install Gemini SDK
         run: pip install google-genai
 
-      - name: Generate AI PR Summary
+      - name: Run AI PR Summary & Smart Analysis
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
+          # Get the diff
           git diff origin/${{ github.base_ref }} HEAD > pr_diff.txt
           
-          # 2. CREATE A FORMATTED FILE INSTEAD OF A BASH VARIABLE
-          echo "🤖 **AI Reviewer Summary:**" > ai_summary.txt
-          echo "" >> ai_summary.txt
-          cat pr_diff.txt | python scripts/pr_reviewer.py >> ai_summary.txt
+          # Initialize the comment file
+          echo "## 🤖 AI Code Reviewer" > final_comment.txt
+          echo "" >> final_comment.txt
           
-      - name: Post Comment to PR
+          # 1. Run the Summary Script
+          echo "### 📝 PR Summary" >> final_comment.txt
+          cat pr_diff.txt | python scripts/pr_reviewer.py >> final_comment.txt
+          echo "" >> final_comment.txt
+          
+          # 2. Run the Smart Static Analysis Script
+          echo "### 🔍 Smart Static Analysis" >> final_comment.txt
+          cat pr_diff.txt | python scripts/smart_analyzer.py >> final_comment.txt
+
+      - name: Post Comprehensive Comment to PR
         env:
-         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr comment ${{ github.event.pull_request.number }} --body-file ai_summary.txt
+          gh pr comment ${{ github.event.pull_request.number }} --body-file final_comment.txt
