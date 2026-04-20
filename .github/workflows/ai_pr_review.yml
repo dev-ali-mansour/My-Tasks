@@ -1,47 +1,59 @@
-name: AI PR Reviewer
+name: AI PR Review
 
 on:
-  pull_request:
-    branches:
-      - main
-      - develop
+  workflow_run:
+    workflows: ["Run tests"]
+    types:
+      - completed
 
 jobs:
-  build_and_review:
+  review:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-
-      - name: Run Unit Tests
-        run: ./gradlew testDebugUnitTest
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: '3.13'
 
       - name: Install Gemini SDK
-        run: pip install google-generativeai
+        run: pip install google-genai
 
       - name: Generate AI PR Summary
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
         run: |
-          git diff origin/${{ github.base_ref }} HEAD > pr_diff.txt
+          # Prevent failure if the original run was triggered by a direct push instead of a PR
+          if [ -z "$PR_NUMBER" ] || [ "$PR_NUMBER" == "null" ]; then
+            echo "No PR number found in payload. Skipping AI Review."
+            exit 0
+          fi
+
+          # Using the GitHub CLI is much safer than raw git commands in a workflow_run context
+          gh pr diff $PR_NUMBER > pr_diff.txt
+          
+          # Run your script
           cat pr_diff.txt | python scripts/pr_reviewer.py > ai_summary.txt
 
       - name: Post Comment to PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
         run: |
-          SUMMARY=$(cat ai_summary.txt)
-          gh pr comment ${{ github.event.pull_request.number }} --body "🤖 **AI Reviewer Summary:** $SUMMARY"
+          if [ -n "$PR_NUMBER" ] && [ "$PR_NUMBER" != "null" ]; then
+            # Create a combined file to avoid bash string parsing errors with AI output
+            echo "🤖 **AI Reviewer Summary:**" > comment_body.txt
+            echo "" >> comment_body.txt
+            cat ai_summary.txt >> comment_body.txt
+          
+            # Use --body-file instead of inline strings
+            gh pr comment $PR_NUMBER --body-file comment_body.txt
+          fi
