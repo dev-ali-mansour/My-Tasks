@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.room)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.koin.compiler)
     alias(libs.plugins.junit5)
     alias(libs.plugins.jacoco)
 }
@@ -185,9 +186,10 @@ tasks.withType<Test>().configureEach {
     }
 }
 
-ksp {
-    arg("KOIN_DEFAULT_MODULE", "false")
-    arg("KOIN_CONFIG_CHECK", "true")
+junitPlatform {
+    jacocoOptions {
+        taskGenerationEnabled = false
+    }
 }
 
 dependencies {
@@ -209,7 +211,6 @@ dependencies {
     implementation(platform(libs.koin.bom))
     implementation(libs.bundles.koin.core)
     implementation(libs.bundles.koin.android)
-    ksp(libs.koin.ksp.compiler)
     implementation(libs.bundles.room)
     ksp(libs.room.compiler)
     testImplementation(platform(libs.junit.bom))

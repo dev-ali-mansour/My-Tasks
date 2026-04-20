@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.KoinViewModel
 
 @Stable
 @KoinViewModel
@@ -42,18 +42,21 @@ class UpdateTaskViewModel(
 
     fun processEvent(event: UpdateTaskEvent) {
         when (event) {
-            is UpdateTaskEvent.UpdateTitle ->
+            is UpdateTaskEvent.UpdateTitle -> {
                 _uiState.update { it.copy(title = event.title) }
+            }
 
-            is UpdateTaskEvent.UpdateDescription ->
+            is UpdateTaskEvent.UpdateDescription -> {
                 _uiState.update { it.copy(description = event.description) }
+            }
 
-            is UpdateTaskEvent.UpdateDueDate ->
+            is UpdateTaskEvent.UpdateDueDate -> {
                 _uiState.update {
                     it.copy(dueDate = event.dueDate)
                 }
+            }
 
-            is UpdateTaskEvent.LoadTask ->
+            is UpdateTaskEvent.LoadTask -> {
                 _uiState.update {
                     it.copy(
                         id = event.task.id,
@@ -62,24 +65,27 @@ class UpdateTaskViewModel(
                         dueDate = event.task.dueDate,
                     )
                 }
+            }
 
             is UpdateTaskEvent.Proceed -> {
                 when {
-                    uiState.value.title.isBlank() ->
+                    uiState.value.title.isBlank() -> {
                         _uiState.update {
                             it.copy(
                                 effect =
                                     TaskEffect.ShowError(message = UiText.StringResourceId(R.string.title_cannot_be_empty)),
                             )
                         }
+                    }
 
-                    uiState.value.description.isBlank() ->
+                    uiState.value.description.isBlank() -> {
                         _uiState.update {
                             it.copy(
                                 effect =
                                     TaskEffect.ShowError(message = UiText.StringResourceId(R.string.description_cannot_be_empty)),
                             )
                         }
+                    }
 
                     else -> {
                         updateTaskJob?.cancel()
@@ -88,7 +94,9 @@ class UpdateTaskViewModel(
                 }
             }
 
-            is UpdateTaskEvent.ConsumeEffect -> _uiState.update { it.copy(effect = null) }
+            is UpdateTaskEvent.ConsumeEffect -> {
+                _uiState.update { it.copy(effect = null) }
+            }
         }
     }
 
