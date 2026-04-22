@@ -11,7 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dev.alimansour.mytasks.core.ui.utils.UiText
-import dev.alimansour.mytasks.feature.home.HomeScreen
+import dev.alimansour.mytasks.feature.home.screen.HomeScreen
 import dev.alimansour.mytasks.feature.task.SelectedTaskViewModel
 import dev.alimansour.mytasks.feature.task.UpdateTaskEvent
 import dev.alimansour.mytasks.feature.task.add.NewTaskScreen
