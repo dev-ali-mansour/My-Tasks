@@ -8,6 +8,7 @@ import dev.alimansour.mytasks.core.domain.usecase.UpdateTaskUseCase
 import dev.alimansour.mytasks.core.ui.utils.UiText
 import dev.alimansour.mytasks.feature.task.TaskEffect
 import dev.alimansour.mytasks.feature.task.UpdateTaskEvent
+import dev.alimansour.mytasks.feature.task.update.screen.UpdateTaskViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

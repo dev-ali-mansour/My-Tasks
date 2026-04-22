@@ -1,4 +1,4 @@
-package dev.alimansour.mytasks.feature.task.add
+package dev.alimansour.mytasks.feature.task.add.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

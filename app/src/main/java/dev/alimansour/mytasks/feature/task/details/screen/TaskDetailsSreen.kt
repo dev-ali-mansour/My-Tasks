@@ -1,4 +1,4 @@
-package dev.alimansour.mytasks.feature.task.details
+package dev.alimansour.mytasks.feature.task.details.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -121,7 +121,14 @@ private fun TaskDetailsContent(
 
                 Spacer(Modifier.height(24.dp))
 
-                DetailItem(label = stringResource(R.string.due_date), value = task.dueDate.getFormattedDate(context = context, pattern = "MMMM dd, yyyy"))
+                DetailItem(
+                    label = stringResource(R.string.due_date),
+                    value =
+                        task.dueDate.getFormattedDate(
+                            context = context,
+                            pattern = "MMMM dd, yyyy",
+                        ),
+                )
 
                 Spacer(Modifier.height(16.dp))
 
