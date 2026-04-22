@@ -24,8 +24,6 @@ import kotlinx.coroutines.test.setMain
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -72,6 +70,8 @@ class HomeViewModelTest {
             // GIVEN
             val error = DataError.Local.DATABASE_READ_ERROR
             coEvery { getTasksUseCase() } returns flowOf<Result<List<Task>, DataError.Local>>(Result.Error(error))
+            val effects = mutableListOf<HomeEffect>()
+            val effectJob = launch(testDispatcher) { viewModel.effect.collect { effects.add(it) } }
             val job = launch(testDispatcher) { viewModel.uiState.collect { } }
 
             // WHEN
@@ -79,9 +79,10 @@ class HomeViewModelTest {
 
             // THEN
             assertFalse(viewModel.uiState.value.isLoading)
-            assertTrue(viewModel.uiState.value.effect is HomeEffect.ShowError)
+            assertTrue(effects.last() is HomeEffect.ShowError)
 
             job.cancel()
+            effectJob.cancel()
         }
 
     @Test
@@ -129,6 +130,8 @@ class HomeViewModelTest {
             // GIVEN
             coEvery { getTasksUseCase() } returns flowOf(Result.Success(emptyList()))
             val task = Task(id = 42L, title = "Task", description = "Desc", isCompleted = false, dueDate = 0L)
+            val effects = mutableListOf<HomeEffect>()
+            val effectJob = launch(testDispatcher) { viewModel.effect.collect { effects.add(it) } }
             val job = launch(testDispatcher) { viewModel.uiState.collect { } }
             testDispatcher.scheduler.advanceUntilIdle()
 
@@ -137,11 +140,12 @@ class HomeViewModelTest {
             testDispatcher.scheduler.advanceUntilIdle()
 
             // THEN
-            val effect = viewModel.uiState.value.effect
-            assertTrue(effect is HomeEffect.NavigateToTaskDetails)
-            assertEquals(task, (effect as HomeEffect.NavigateToTaskDetails).task)
+            val lastEffect = effects.last()
+            assertTrue(lastEffect is HomeEffect.NavigateToTaskDetails)
+            assertEquals(task, (lastEffect as HomeEffect.NavigateToTaskDetails).task)
 
             job.cancel()
+            effectJob.cancel()
         }
 
     @Test
@@ -152,6 +156,8 @@ class HomeViewModelTest {
             val error = DataError.Local.DATABASE_WRITE_ERROR
             coEvery { getTasksUseCase() } returns flowOf(Result.Success(listOf(task)))
             coEvery { updateTaskUseCase(any()) } returns flowOf(Result.Error(error))
+            val effects = mutableListOf<HomeEffect>()
+            val effectJob = launch(testDispatcher) { viewModel.effect.collect { effects.add(it) } }
             val job = launch(testDispatcher) { viewModel.uiState.collect { } }
             testDispatcher.scheduler.advanceUntilIdle()
 
@@ -161,34 +167,10 @@ class HomeViewModelTest {
 
             // THEN
             assertFalse(viewModel.uiState.value.isLoading)
-            assertTrue(viewModel.uiState.value.effect is HomeEffect.ShowError)
+            assertTrue(effects.last() is HomeEffect.ShowError)
 
             job.cancel()
-        }
-
-    @Test
-    fun `when ConsumeEffect event is processed then effect is cleared`() =
-        runTest(testDispatcher) {
-            // GIVEN
-            coEvery { getTasksUseCase() } returns flowOf(Result.Success(emptyList()))
-            val job = launch(testDispatcher) { viewModel.uiState.collect { } }
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            // WHEN
-            viewModel.processEvent(HomeEvent.NavigateToNewTaskScreen)
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            // THEN
-            assertNotNull(viewModel.uiState.value.effect)
-
-            // WHEN
-            viewModel.processEvent(HomeEvent.ConsumeEffect)
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            // THEN
-            assertNull(viewModel.uiState.value.effect)
-
-            job.cancel()
+            effectJob.cancel()
         }
 
     @Test
@@ -196,6 +178,8 @@ class HomeViewModelTest {
         runTest(testDispatcher) {
             // GIVEN
             coEvery { getTasksUseCase() } returns flowOf(Result.Success(emptyList()))
+            val effects = mutableListOf<HomeEffect>()
+            val effectJob = launch(testDispatcher) { viewModel.effect.collect { effects.add(it) } }
             val job = launch(testDispatcher) { viewModel.uiState.collect { } }
             testDispatcher.scheduler.advanceUntilIdle()
 
@@ -204,42 +188,11 @@ class HomeViewModelTest {
             testDispatcher.scheduler.advanceUntilIdle()
 
             // THEN
-            val effect = viewModel.uiState.value.effect
-            assertTrue(effect is HomeEffect.NavigateToRoute)
-            assertEquals(Route.NewTask, (effect as HomeEffect.NavigateToRoute).route)
+            val lastEffect = effects.last()
+            assertTrue(lastEffect is HomeEffect.NavigateToRoute)
+            assertEquals(Route.NewTask, (lastEffect as HomeEffect.NavigateToRoute).route)
 
             job.cancel()
-        }
-
-    @Test
-    fun `when navigation event is processed then effect flow emits same value and is cleared after ConsumeEffect`() =
-        runTest(testDispatcher) {
-            // GIVEN
-            coEvery { getTasksUseCase() } returns flowOf(Result.Success(emptyList()))
-            val uiStateJob = launch(testDispatcher) { viewModel.uiState.collect { } }
-            val effects = mutableListOf<HomeEffect?>()
-            val effectJob = launch(testDispatcher) { viewModel.effect.collect { effects.add(it) } }
-            testDispatcher.scheduler.advanceUntilIdle()
-            val task = Task(id = 100L, title = "Task", description = "Desc", isCompleted = false, dueDate = 0L)
-
-            // WHEN
-            viewModel.processEvent(HomeEvent.NavigateToTaskDetailsScreen(task))
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            // THEN
-            val lastEffect = effects.lastOrNull()
-            assertTrue(lastEffect is HomeEffect.NavigateToTaskDetails)
-            assertEquals(viewModel.uiState.value.effect, lastEffect)
-
-            // WHEN
-            viewModel.processEvent(HomeEvent.ConsumeEffect)
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            // THEN
-            assertNull(viewModel.uiState.value.effect)
-            assertNull(effects.last())
-
-            uiStateJob.cancel()
             effectJob.cancel()
         }
 

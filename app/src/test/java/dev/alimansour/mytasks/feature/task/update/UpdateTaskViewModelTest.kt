@@ -25,7 +25,6 @@ import kotlinx.coroutines.test.setMain
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -57,7 +56,6 @@ class UpdateTaskViewModelTest {
             assertEquals("", state.title)
             assertEquals("", state.description)
             assertTrue(state.dueDate > 0L)
-            assertNull(state.effect)
         }
 
     @Test
@@ -134,7 +132,8 @@ class UpdateTaskViewModelTest {
     fun `Proceed with blank title emits ShowError with title message`() =
         runTest(testDispatcher) {
             // GIVEN
-            val job = launch(testDispatcher) { viewModel.uiState.collect { } }
+            val effects = mutableListOf<TaskEffect>()
+            val effectJob = launch(testDispatcher) { viewModel.effect.collect { effects.add(it) } }
             viewModel.processEvent(UpdateTaskEvent.UpdateTitle(""))
             viewModel.processEvent(UpdateTaskEvent.UpdateDescription("Some description"))
             testDispatcher.scheduler.advanceUntilIdle()
@@ -144,20 +143,20 @@ class UpdateTaskViewModelTest {
             testDispatcher.scheduler.advanceUntilIdle()
 
             // THEN
-            val effect = viewModel.uiState.value.effect
-            assertTrue(effect is TaskEffect.ShowError)
-            effect as TaskEffect.ShowError
+            assertTrue(effects.last() is TaskEffect.ShowError)
+            val effect = effects.last() as TaskEffect.ShowError
             assertTrue(effect.message is UiText.StringResourceId)
             assertEquals(R.string.title_cannot_be_empty, (effect.message as UiText.StringResourceId).id)
 
-            job.cancel()
+            effectJob.cancel()
         }
 
     @Test
     fun `Proceed with blank description emits ShowError with description message`() =
         runTest(testDispatcher) {
             // GIVEN
-            val job = launch(testDispatcher) { viewModel.uiState.collect { } }
+            val effects = mutableListOf<TaskEffect>()
+            val effectJob = launch(testDispatcher) { viewModel.effect.collect { effects.add(it) } }
             viewModel.processEvent(UpdateTaskEvent.UpdateTitle("Title"))
             viewModel.processEvent(UpdateTaskEvent.UpdateDescription(""))
             testDispatcher.scheduler.advanceUntilIdle()
@@ -167,13 +166,12 @@ class UpdateTaskViewModelTest {
             testDispatcher.scheduler.advanceUntilIdle()
 
             // THEN
-            val effect = viewModel.uiState.value.effect
-            assertTrue(effect is TaskEffect.ShowError)
-            effect as TaskEffect.ShowError
+            assertTrue(effects.last() is TaskEffect.ShowError)
+            val effect = effects.last() as TaskEffect.ShowError
             assertTrue(effect.message is UiText.StringResourceId)
             assertEquals(R.string.description_cannot_be_empty, (effect.message as UiText.StringResourceId).id)
 
-            job.cancel()
+            effectJob.cancel()
         }
 
     @Test
@@ -183,7 +181,8 @@ class UpdateTaskViewModelTest {
             val task = Task(id = 1L, title = "Title", description = "Desc", dueDate = 123L)
             val results = flowOf<Result<Unit, DataError.Local>>(Result.Success(Unit))
             coEvery { updateTaskUseCase(any()) } returns results
-            val job = launch(testDispatcher) { viewModel.uiState.collect { } }
+            val effects = mutableListOf<TaskEffect>()
+            val effectJob = launch(testDispatcher) { viewModel.effect.collect { effects.add(it) } }
             viewModel.processEvent(UpdateTaskEvent.LoadTask(task))
             testDispatcher.scheduler.advanceUntilIdle()
 
@@ -194,9 +193,9 @@ class UpdateTaskViewModelTest {
             // THEN
             val state = viewModel.uiState.value
             assertFalse(state.isLoading)
-            assertTrue(state.effect is TaskEffect.ShowSuccess)
+            assertTrue(effects.last() is TaskEffect.ShowSuccess)
 
-            job.cancel()
+            effectJob.cancel()
         }
 
     @Test
@@ -207,7 +206,8 @@ class UpdateTaskViewModelTest {
             val error = DataError.Local.DATABASE_WRITE_ERROR
             val results = flowOf<Result<Unit, DataError.Local>>(Result.Error(error))
             coEvery { updateTaskUseCase(any()) } returns results
-            val job = launch(testDispatcher) { viewModel.uiState.collect { } }
+            val effects = mutableListOf<TaskEffect>()
+            val effectJob = launch(testDispatcher) { viewModel.effect.collect { effects.add(it) } }
             viewModel.processEvent(UpdateTaskEvent.LoadTask(task))
             testDispatcher.scheduler.advanceUntilIdle()
 
@@ -218,31 +218,9 @@ class UpdateTaskViewModelTest {
             // THEN
             val state = viewModel.uiState.value
             assertFalse(state.isLoading)
-            assertTrue(state.effect is TaskEffect.ShowError)
+            assertTrue(effects.last() is TaskEffect.ShowError)
 
-            job.cancel()
-        }
-
-    @Test
-    fun `ConsumeEffect clears existing effect`() =
-        runTest(testDispatcher) {
-            // GIVEN
-            val task = Task(id = 1L, title = "Title", description = "Desc", dueDate = 123L)
-            coEvery { updateTaskUseCase(any()) } returns flowOf(Result.Success(Unit))
-            val job = launch(testDispatcher) { viewModel.uiState.collect { } }
-            viewModel.processEvent(UpdateTaskEvent.LoadTask(task))
-            viewModel.processEvent(UpdateTaskEvent.Proceed)
-            testDispatcher.scheduler.advanceUntilIdle()
-            assertTrue(viewModel.uiState.value.effect != null)
-
-            // WHEN
-            viewModel.processEvent(UpdateTaskEvent.ConsumeEffect)
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            // THEN
-            assertNull(viewModel.uiState.value.effect)
-
-            job.cancel()
+            effectJob.cancel()
         }
 
     @Test
@@ -272,29 +250,6 @@ class UpdateTaskViewModelTest {
 
             // THEN
             assertFalse(viewModel.uiState.value.isLoading)
-
-            job.cancel()
-        }
-
-    @Test
-    fun `effect flow emits null after ConsumeEffect`() =
-        runTest(testDispatcher) {
-            // GIVEN
-            val task = Task(id = 1L, title = "Title", description = "Desc", dueDate = 123L)
-            coEvery { updateTaskUseCase(any()) } returns flowOf<Result<Unit, DataError.Local>>(Result.Success(Unit))
-            val collectedEffects = mutableListOf<TaskEffect?>()
-            val job = launch(testDispatcher) { viewModel.effect.collect { collectedEffects.add(it) } }
-            viewModel.processEvent(UpdateTaskEvent.LoadTask(task))
-            viewModel.processEvent(UpdateTaskEvent.Proceed)
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            // WHEN
-            viewModel.processEvent(UpdateTaskEvent.ConsumeEffect)
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            // THEN
-            assertNull(viewModel.uiState.value.effect)
-            assertNull(collectedEffects.lastOrNull())
 
             job.cancel()
         }
