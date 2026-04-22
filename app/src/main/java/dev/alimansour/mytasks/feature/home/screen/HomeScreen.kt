@@ -1,10 +1,6 @@
 package dev.alimansour.mytasks.feature.home.screen
 
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -103,11 +99,7 @@ fun HomeScreen(
     ) { paddingValues ->
         HomeContent(
             uiState = uiState,
-            modifier =
-                Modifier
-                    .consumeWindowInsets(paddingValues)
-                    .padding(top = paddingValues.calculateTopPadding()),
-            contentPadding = paddingValues,
+            modifier = Modifier.padding(paddingValues),
             onEvent = viewModel::processEvent,
         )
     }
@@ -117,7 +109,6 @@ fun HomeScreen(
 private fun HomeContent(
     uiState: HomeState,
     modifier: Modifier = Modifier,
-    contentPadding: androidx.compose.foundation.layout.PaddingValues = androidx.compose.foundation.layout.PaddingValues(0.dp),
     onEvent: (HomeEvent) -> Unit,
 ) {
     val listState = rememberLazyListState()
@@ -134,7 +125,6 @@ private fun HomeContent(
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         state = listState,
-        contentPadding = contentPadding,
     ) {
         items(uiState.tasks, key = { task ->
             task.id
