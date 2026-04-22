@@ -11,7 +11,6 @@ data class HomeState(
     val isFabExpanded: Boolean = false,
     val openDialog: Boolean = false,
     val tasks: List<Task> = emptyList(),
-    val effect: HomeEffect? = null,
 )
 
 sealed interface HomeEffect {
@@ -50,6 +49,4 @@ sealed interface HomeEvent {
     data class OnTaskCheckChanged(
         val task: Task,
     ) : HomeEvent
-
-    object ConsumeEffect : HomeEvent
 }

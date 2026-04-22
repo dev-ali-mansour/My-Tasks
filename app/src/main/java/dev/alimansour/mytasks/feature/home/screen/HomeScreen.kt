@@ -23,11 +23,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import dev.alimansour.mytasks.R
 import dev.alimansour.mytasks.core.domain.model.Task
 import dev.alimansour.mytasks.core.ui.common.CommonTopAppBar
-import dev.alimansour.mytasks.core.ui.common.LaunchedUiEffectHandler
 import dev.alimansour.mytasks.core.ui.navigation.Route
 import dev.alimansour.mytasks.core.ui.theme.MyTasksTheme
 import dev.alimansour.mytasks.core.ui.utils.UiText
@@ -46,32 +48,33 @@ fun HomeScreen(
     showError: (message: UiText) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
 
-    LaunchedUiEffectHandler(
-        viewModel.effect,
-        onConsumeEffect = { viewModel.processEvent(HomeEvent.ConsumeEffect) },
-        onEffect = { effect ->
-            when (effect) {
-                is HomeEffect.NavigateToRoute -> {
-                    navigateToRoute(effect.route)
-                }
+    LaunchedEffect(viewModel.effect, lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.effect.collect { effect ->
+                when (effect) {
+                    is HomeEffect.NavigateToRoute -> {
+                        navigateToRoute(effect.route)
+                    }
 
-                is HomeEffect.NavigateToTaskDetails -> {
-                    navigateToTaskDetails(effect.task)
-                }
+                    is HomeEffect.NavigateToTaskDetails -> {
+                        navigateToTaskDetails(effect.task)
+                    }
 
-                is HomeEffect.ShowError -> {
-                    showError(effect.message)
-                }
+                    is HomeEffect.ShowError -> {
+                        showError(effect.message)
+                    }
 
-                is HomeEffect.ExitApp -> {
-                    (context.activity).finishAffinity()
-                    exitProcess(status = 0)
+                    is HomeEffect.ExitApp -> {
+                        (context.activity).finishAffinity()
+                        exitProcess(status = 0)
+                    }
                 }
             }
-        },
-    )
+        }
+    }
 
     Scaffold(
         topBar = {
