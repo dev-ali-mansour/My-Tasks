@@ -31,6 +31,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,10 +46,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import dev.alimansour.mytasks.R
 import dev.alimansour.mytasks.core.ui.common.CommonTopAppBar
-import dev.alimansour.mytasks.core.ui.common.LaunchedUiEffectHandler
 import dev.alimansour.mytasks.core.ui.theme.MyTasksTheme
 import dev.alimansour.mytasks.core.ui.theme.interFamily
 import dev.alimansour.mytasks.core.ui.utils.UiText
@@ -67,22 +70,23 @@ fun UpdateTaskScreen(
     showError: (message: UiText) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedUiEffectHandler(
-        viewModel.effect,
-        onConsumeEffect = { viewModel.processEvent(UpdateTaskEvent.ConsumeEffect) },
-        onEffect = { effect ->
-            when (effect) {
-                is TaskEffect.ShowSuccess -> {
-                    onSuccess(UiText.StringResourceId(R.string.task_updated_success))
-                }
+    LaunchedEffect(viewModel.effect, lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.effect.collect { effect ->
+                when (effect) {
+                    is TaskEffect.ShowSuccess -> {
+                        onSuccess(UiText.StringResourceId(R.string.task_updated_success))
+                    }
 
-                is TaskEffect.ShowError -> {
-                    showError(effect.message)
+                    is TaskEffect.ShowError -> {
+                        showError(effect.message)
+                    }
                 }
             }
-        },
-    )
+        }
+    }
 
     Scaffold(topBar = {
         CommonTopAppBar(title = stringResource(id = R.string.update_task)) {
