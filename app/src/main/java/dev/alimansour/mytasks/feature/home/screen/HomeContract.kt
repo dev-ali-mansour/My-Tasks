@@ -1,4 +1,4 @@
-package dev.alimansour.mytasks.feature.home
+package dev.alimansour.mytasks.feature.home.screen
 
 import androidx.compose.runtime.Stable
 import dev.alimansour.mytasks.core.domain.model.Task

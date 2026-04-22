@@ -1,4 +1,4 @@
-package dev.alimansour.mytasks.feature.home
+package dev.alimansour.mytasks.feature.home.screen
 
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
@@ -10,7 +10,6 @@ import dev.alimansour.mytasks.core.domain.usecase.GetTasksUseCase
 import dev.alimansour.mytasks.core.domain.usecase.UpdateTaskUseCase
 import dev.alimansour.mytasks.core.ui.navigation.Route
 import dev.alimansour.mytasks.core.ui.utils.toUiText
-import dev.alimansour.mytasks.feature.home.HomeEffect.NavigateToRoute
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -70,7 +69,7 @@ class HomeViewModel(
 
             is HomeEvent.NavigateToNewTaskScreen -> {
                 _uiState.update {
-                    it.copy(effect = NavigateToRoute(route = Route.NewTask))
+                    it.copy(effect = HomeEffect.NavigateToRoute(route = Route.NewTask))
                 }
             }
 

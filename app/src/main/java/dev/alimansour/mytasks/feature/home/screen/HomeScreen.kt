@@ -1,4 +1,4 @@
-package dev.alimansour.mytasks.feature.home
+package dev.alimansour.mytasks.feature.home.screen
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -32,6 +32,7 @@ import dev.alimansour.mytasks.core.ui.navigation.Route
 import dev.alimansour.mytasks.core.ui.theme.MyTasksTheme
 import dev.alimansour.mytasks.core.ui.utils.UiText
 import dev.alimansour.mytasks.core.ui.utils.activity
+import dev.alimansour.mytasks.feature.home.component.TaskItem
 import org.koin.androidx.compose.koinViewModel
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess

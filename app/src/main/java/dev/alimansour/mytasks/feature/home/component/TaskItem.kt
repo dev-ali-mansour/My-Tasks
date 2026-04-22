@@ -1,4 +1,4 @@
-package dev.alimansour.mytasks.feature.home
+package dev.alimansour.mytasks.feature.home.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
