@@ -12,10 +12,11 @@ import dev.alimansour.mytasks.core.ui.navigation.Route
 import dev.alimansour.mytasks.core.ui.utils.toUiText
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -39,53 +40,47 @@ class HomeViewModel(
                 started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000L),
                 initialValue = _uiState.value,
             )
-    val effect = _uiState.map { it.effect }
+    private val _effect = Channel<HomeEffect>(capacity = Channel.BUFFERED)
+    val effect = _effect.receiveAsFlow()
 
     fun processEvent(event: HomeEvent) {
-        when (event) {
-            is HomeEvent.OnExpandStateChanged -> {
-                _uiState.update {
-                    it.copy(isFabExpanded = event.isExpanded)
+        viewModelScope.launch {
+            when (event) {
+                is HomeEvent.OnExpandStateChanged -> {
+                    _uiState.update {
+                        it.copy(isFabExpanded = event.isExpanded)
+                    }
                 }
-            }
 
-            is HomeEvent.OnBackPress -> {
-                _uiState.update {
-                    it.copy(openDialog = true)
+                is HomeEvent.OnBackPress -> {
+                    _uiState.update {
+                        it.copy(openDialog = true)
+                    }
                 }
-            }
 
-            is HomeEvent.OnExitDialogConfirmed -> {
-                _uiState.update {
-                    it.copy(openDialog = false, effect = HomeEffect.ExitApp)
+                is HomeEvent.OnExitDialogConfirmed -> {
+                    _uiState.update { it.copy(openDialog = false) }
+                    _effect.send(HomeEffect.ExitApp)
                 }
-            }
 
-            is HomeEvent.OnExitDialogCancelled -> {
-                _uiState.update {
-                    it.copy(openDialog = false)
+                is HomeEvent.OnExitDialogCancelled -> {
+                    _uiState.update {
+                        it.copy(openDialog = false)
+                    }
                 }
-            }
 
-            is HomeEvent.NavigateToNewTaskScreen -> {
-                _uiState.update {
-                    it.copy(effect = HomeEffect.NavigateToRoute(route = Route.NewTask))
+                is HomeEvent.NavigateToNewTaskScreen -> {
+                    _effect.send(HomeEffect.NavigateToRoute(route = Route.NewTask))
                 }
-            }
 
-            is HomeEvent.NavigateToTaskDetailsScreen -> {
-                _uiState.update {
-                    it.copy(effect = HomeEffect.NavigateToTaskDetails(task = event.task))
+                is HomeEvent.NavigateToTaskDetailsScreen -> {
+                    _effect.send(HomeEffect.NavigateToTaskDetails(task = event.task))
                 }
-            }
 
-            is HomeEvent.OnTaskCheckChanged -> {
-                updateTaskJob?.cancel()
-                updateTaskJob = updateTask(event.task)
-            }
-
-            is HomeEvent.ConsumeEffect -> {
-                _uiState.update { it.copy(effect = null) }
+                is HomeEvent.OnTaskCheckChanged -> {
+                    updateTaskJob?.cancel()
+                    updateTaskJob = updateTask(event.task)
+                }
             }
         }
     }
@@ -100,9 +95,8 @@ class HomeViewModel(
                             it.copy(isLoading = false)
                         }
                     }.onError { error ->
-                        _uiState.update {
-                            it.copy(isLoading = false, effect = HomeEffect.ShowError(message = error.toUiText()))
-                        }
+                        _effect.send(HomeEffect.ShowError(message = error.toUiText()))
+                        _uiState.update { it.copy(isLoading = false) }
                     }
             }
         }
@@ -117,9 +111,8 @@ class HomeViewModel(
                             it.copy(isLoading = false, tasks = tasks)
                         }
                     }.onError { error ->
-                        _uiState.update {
-                            it.copy(isLoading = false, effect = HomeEffect.ShowError(message = error.toUiText()))
-                        }
+                        _uiState.update { it.copy(isLoading = false) }
+                        _effect.send(HomeEffect.ShowError(message = error.toUiText()))
                     }
             }
         }

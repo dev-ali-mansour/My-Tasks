@@ -10,9 +10,10 @@ import dev.alimansour.mytasks.core.domain.usecase.DeleteTaskUseCase
 import dev.alimansour.mytasks.core.ui.utils.toUiText
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -33,31 +34,28 @@ class TaskDetailsViewModel(
                 started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000L),
                 initialValue = _uiState.value,
             )
-    val effect = _uiState.map { it.effect }
+    private val _effect = Channel<TaskDetailsEffect>(capacity = Channel.BUFFERED)
+    val effect = _effect.receiveAsFlow()
 
     fun processEvent(event: TaskDetailsEvent) {
-        when (event) {
-            is TaskDetailsEvent.LoadTask -> {
-                _uiState.update { it.copy(task = event.task) }
-            }
+        viewModelScope.launch {
+            when (event) {
+                is TaskDetailsEvent.LoadTask -> {
+                    _uiState.update { it.copy(task = event.task) }
+                }
 
-            is TaskDetailsEvent.UpdateTask -> {
-                _uiState.value.task?.let { task ->
-                    _uiState.update {
-                        it.copy(effect = TaskDetailsEffect.NavigateToUpdateScreen(task))
+                is TaskDetailsEvent.UpdateTask -> {
+                    _uiState.value.task?.let { task ->
+                        _effect.send(TaskDetailsEffect.NavigateToUpdateScreen(task))
                     }
                 }
-            }
 
-            is TaskDetailsEvent.DeleteTask -> {
-                _uiState.value.task?.let { task ->
-                    deleteTaskJob?.cancel()
-                    deleteTaskJob = launchDeleteTask(task)
+                is TaskDetailsEvent.DeleteTask -> {
+                    _uiState.value.task?.let { task ->
+                        deleteTaskJob?.cancel()
+                        deleteTaskJob = launchDeleteTask(task)
+                    }
                 }
-            }
-
-            is TaskDetailsEvent.ConsumeEffect -> {
-                _uiState.update { it.copy(effect = null) }
             }
         }
     }
@@ -69,12 +67,14 @@ class TaskDetailsViewModel(
                 result
                     .onSuccess {
                         _uiState.update {
-                            it.copy(isLoading = false, effect = TaskDetailsEffect.ShowSuccess)
+                            it.copy(isLoading = false)
                         }
+                        _effect.send(TaskDetailsEffect.ShowSuccess)
                     }.onError { error ->
                         _uiState.update {
-                            it.copy(isLoading = false, effect = TaskDetailsEffect.ShowError(message = error.toUiText()))
+                            it.copy(isLoading = false)
                         }
+                        _effect.send(TaskDetailsEffect.ShowError(message = error.toUiText()))
                     }
             }
         }
