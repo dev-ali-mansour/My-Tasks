@@ -14,12 +14,12 @@ import dev.alimansour.mytasks.core.ui.utils.UiText
 import dev.alimansour.mytasks.feature.home.screen.HomeScreen
 import dev.alimansour.mytasks.feature.task.SelectedTaskViewModel
 import dev.alimansour.mytasks.feature.task.UpdateTaskEvent
-import dev.alimansour.mytasks.feature.task.add.NewTaskScreen
-import dev.alimansour.mytasks.feature.task.details.TaskDetailsEvent
-import dev.alimansour.mytasks.feature.task.details.TaskDetailsScreen
-import dev.alimansour.mytasks.feature.task.details.TaskDetailsViewModel
-import dev.alimansour.mytasks.feature.task.update.UpdateTaskScreen
-import dev.alimansour.mytasks.feature.task.update.UpdateTaskViewModel
+import dev.alimansour.mytasks.feature.task.add.screen.NewTaskScreen
+import dev.alimansour.mytasks.feature.task.details.screen.TaskDetailsEvent
+import dev.alimansour.mytasks.feature.task.details.screen.TaskDetailsScreen
+import dev.alimansour.mytasks.feature.task.details.screen.TaskDetailsViewModel
+import dev.alimansour.mytasks.feature.task.update.screen.UpdateTaskScreen
+import dev.alimansour.mytasks.feature.task.update.screen.UpdateTaskViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

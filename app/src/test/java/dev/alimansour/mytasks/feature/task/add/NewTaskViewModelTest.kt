@@ -6,6 +6,7 @@ import dev.alimansour.mytasks.core.domain.model.Task
 import dev.alimansour.mytasks.core.domain.usecase.AddTaskUseCase
 import dev.alimansour.mytasks.feature.task.NewTaskEvent
 import dev.alimansour.mytasks.feature.task.TaskEffect
+import dev.alimansour.mytasks.feature.task.add.screen.NewTaskViewModel
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
