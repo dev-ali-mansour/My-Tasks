@@ -6,10 +6,12 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -87,7 +89,14 @@ fun UpdateTaskScreen(
             onNavigationIconClicked()
         }
     }) { innerPadding ->
-        UpdateTaskContent(modifier = modifier.padding(innerPadding), uiState = uiState, onEvent = viewModel::processEvent)
+        UpdateTaskContent(
+            modifier =
+                modifier
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding),
+            uiState = uiState,
+            onEvent = viewModel::processEvent,
+        )
     }
 }
 
@@ -120,6 +129,7 @@ private fun UpdateTaskContent(
                 .padding(16.dp)
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
+                .imePadding()
                 .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
