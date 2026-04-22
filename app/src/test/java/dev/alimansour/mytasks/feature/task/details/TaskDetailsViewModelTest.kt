@@ -6,6 +6,10 @@ import dev.alimansour.mytasks.core.domain.model.Task
 import dev.alimansour.mytasks.core.domain.usecase.DeleteTaskUseCase
 import dev.alimansour.mytasks.core.ui.utils.UiText
 import dev.alimansour.mytasks.core.ui.utils.toUiText
+import dev.alimansour.mytasks.feature.task.details.screen.TaskDetailsEffect
+import dev.alimansour.mytasks.feature.task.details.screen.TaskDetailsEvent
+import dev.alimansour.mytasks.feature.task.details.screen.TaskDetailsState
+import dev.alimansour.mytasks.feature.task.details.screen.TaskDetailsViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

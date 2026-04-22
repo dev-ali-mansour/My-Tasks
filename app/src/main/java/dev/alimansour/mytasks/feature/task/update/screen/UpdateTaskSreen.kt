@@ -1,4 +1,4 @@
-package dev.alimansour.mytasks.feature.task.add
+package dev.alimansour.mytasks.feature.task.update.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -6,10 +6,12 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -51,15 +53,15 @@ import dev.alimansour.mytasks.core.ui.theme.MyTasksTheme
 import dev.alimansour.mytasks.core.ui.theme.interFamily
 import dev.alimansour.mytasks.core.ui.utils.UiText
 import dev.alimansour.mytasks.core.ui.utils.getFormattedDate
-import dev.alimansour.mytasks.feature.task.NewTaskEvent
 import dev.alimansour.mytasks.feature.task.TaskEffect
 import dev.alimansour.mytasks.feature.task.TaskState
+import dev.alimansour.mytasks.feature.task.UpdateTaskEvent
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun NewTaskScreen(
+fun UpdateTaskScreen(
     modifier: Modifier = Modifier,
-    viewModel: NewTaskViewModel = koinViewModel(),
+    viewModel: UpdateTaskViewModel = koinViewModel(),
     onNavigationIconClicked: () -> Unit,
     onSuccess: (message: UiText) -> Unit,
     showError: (message: UiText) -> Unit,
@@ -68,11 +70,11 @@ fun NewTaskScreen(
 
     LaunchedUiEffectHandler(
         viewModel.effect,
-        onConsumeEffect = { viewModel.processEvent(NewTaskEvent.ConsumeEffect) },
+        onConsumeEffect = { viewModel.processEvent(UpdateTaskEvent.ConsumeEffect) },
         onEffect = { effect ->
             when (effect) {
                 is TaskEffect.ShowSuccess -> {
-                    onSuccess(UiText.StringResourceId(R.string.task_add_success))
+                    onSuccess(UiText.StringResourceId(R.string.task_updated_success))
                 }
 
                 is TaskEffect.ShowError -> {
@@ -83,21 +85,26 @@ fun NewTaskScreen(
     )
 
     Scaffold(topBar = {
-        CommonTopAppBar(
-            title = stringResource(id = R.string.new_task),
-            onNavigationIconClicked = onNavigationIconClicked,
-        )
+        CommonTopAppBar(title = stringResource(id = R.string.update_task)) {
+            onNavigationIconClicked()
+        }
     }) { innerPadding ->
-
-        NewTaskContent(modifier = modifier.padding(innerPadding), uiState = uiState, onEvent = viewModel::processEvent)
+        UpdateTaskContent(
+            modifier =
+                modifier
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding),
+            uiState = uiState,
+            onEvent = viewModel::processEvent,
+        )
     }
 }
 
 @Composable
-private fun NewTaskContent(
+private fun UpdateTaskContent(
     modifier: Modifier = Modifier,
     uiState: TaskState,
-    onEvent: (NewTaskEvent) -> Unit,
+    onEvent: (UpdateTaskEvent) -> Unit,
 ) {
     val context = LocalContext.current
     val interactionSource = remember { MutableInteractionSource() }
@@ -122,13 +129,14 @@ private fun NewTaskContent(
                 .padding(16.dp)
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
+                .imePadding()
                 .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
         Column {
             TextField(
                 value = uiState.title,
-                onValueChange = { onEvent(NewTaskEvent.UpdateTitle(it)) },
+                onValueChange = { onEvent(UpdateTaskEvent.UpdateTitle(it)) },
                 label = {
                     Text(
                         stringResource(R.string.task_title),
@@ -145,7 +153,7 @@ private fun NewTaskContent(
 
             TextField(
                 value = uiState.description,
-                onValueChange = { onEvent(NewTaskEvent.UpdateDescription(it)) },
+                onValueChange = { onEvent(UpdateTaskEvent.UpdateDescription(it)) },
                 label = {
                     Text(
                         stringResource(R.string.description),
@@ -205,7 +213,7 @@ private fun NewTaskContent(
         }
 
         Button(
-            onClick = { onEvent(NewTaskEvent.Proceed) },
+            onClick = { onEvent(UpdateTaskEvent.Proceed) },
             modifier =
                 Modifier
                     .fillMaxWidth()
@@ -218,7 +226,7 @@ private fun NewTaskContent(
             shape = RoundedCornerShape(8.dp),
         ) {
             Text(
-                text = stringResource(R.string.save_task),
+                text = stringResource(R.string.update_task),
                 modifier = Modifier.padding(8.dp),
                 style =
                     MaterialTheme.typography.titleMedium.copy(
@@ -232,7 +240,7 @@ private fun NewTaskContent(
     if (showDatePicker.value) {
         TaskDatePicker(
             onDateSelected = { selectedDate ->
-                onEvent(NewTaskEvent.UpdateDueDate(selectedDate))
+                onEvent(UpdateTaskEvent.UpdateDueDate(selectedDate))
                 showDatePicker.value = false
             },
             onDismiss = {
@@ -276,9 +284,9 @@ fun TaskDatePicker(
 @PreviewScreenSizes
 @PreviewLightDark
 @Composable
-private fun NewTaskContentPreview() {
+private fun UpdateTaskContentPreview() {
     MyTasksTheme(dynamicColor = false) {
-        NewTaskContent(
+        UpdateTaskContent(
             uiState =
                 TaskState(
                     title = "Task Title",

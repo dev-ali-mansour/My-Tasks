@@ -1,4 +1,4 @@
-package dev.alimansour.mytasks.feature.home
+package dev.alimansour.mytasks.feature.home.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -21,8 +21,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.alimansour.mytasks.core.domain.model.Task
-import dev.alimansour.mytasks.core.ui.utils.formatDueDate
 import dev.alimansour.mytasks.core.ui.theme.interFamily
+import dev.alimansour.mytasks.core.ui.utils.formatDueDate
 
 @Composable
 fun TaskItem(
@@ -45,7 +45,7 @@ fun TaskItem(
             onCheckedChange = onCheckedChange,
             colors =
                 CheckboxDefaults.colors(
-                    checkedColor = Color(0xFF3DDC84),
+                    checkedColor = Color(color = 0xFF3DDC84),
                     uncheckedColor = Color.LightGray,
                 ),
         )

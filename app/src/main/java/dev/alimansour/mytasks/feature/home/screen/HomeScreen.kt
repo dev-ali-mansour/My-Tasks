@@ -1,4 +1,4 @@
-package dev.alimansour.mytasks.feature.home
+package dev.alimansour.mytasks.feature.home.screen
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -32,6 +32,7 @@ import dev.alimansour.mytasks.core.ui.navigation.Route
 import dev.alimansour.mytasks.core.ui.theme.MyTasksTheme
 import dev.alimansour.mytasks.core.ui.utils.UiText
 import dev.alimansour.mytasks.core.ui.utils.activity
+import dev.alimansour.mytasks.feature.home.component.TaskItem
 import org.koin.androidx.compose.koinViewModel
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
@@ -154,13 +155,13 @@ private fun HomeContentPreview() {
                             Task(
                                 id = 2,
                                 title = "Book Appointment",
-                                dueDate = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(1),
+                                dueDate = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(ONE_DAY),
                             ),
-                            Task(id = 3, title = "Pay Bills", dueDate = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(2)),
+                            Task(id = 3, title = "Pay Bills", dueDate = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(TWO_DAYS)),
                             Task(
                                 id = 4,
                                 title = "Schedule Meeting",
-                                dueDate = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(3),
+                                dueDate = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(THREE_DAYS),
                             ),
                         ),
                 ),
@@ -168,3 +169,7 @@ private fun HomeContentPreview() {
         )
     }
 }
+
+private const val ONE_DAY = 1L
+private const val TWO_DAYS = 2L
+private const val THREE_DAYS = 3L

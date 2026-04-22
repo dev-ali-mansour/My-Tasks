@@ -1,8 +1,9 @@
-package dev.alimansour.mytasks.feature.task.details
+package dev.alimansour.mytasks.feature.task.details.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,7 +13,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -36,7 +36,6 @@ import dev.alimansour.mytasks.core.ui.common.LaunchedUiEffectHandler
 import dev.alimansour.mytasks.core.ui.theme.MyTasksTheme
 import dev.alimansour.mytasks.core.ui.theme.interFamily
 import dev.alimansour.mytasks.core.ui.utils.UiText
-import dev.alimansour.mytasks.core.ui.utils.UiText.StringResourceId
 import dev.alimansour.mytasks.core.ui.utils.getFormattedDate
 import org.koin.androidx.compose.koinViewModel
 
@@ -61,7 +60,7 @@ fun TaskDetailsScreen(
                 }
 
                 is TaskDetailsEffect.ShowSuccess -> {
-                    onSuccess(StringResourceId(R.string.task_updated_success))
+                    onSuccess(UiText.StringResourceId(R.string.task_updated_success))
                 }
 
                 is TaskDetailsEffect.ShowError -> {
@@ -76,7 +75,14 @@ fun TaskDetailsScreen(
             onNavigationIconClicked()
         }
     }) { innerPadding ->
-        TaskDetailsContent(modifier = modifier.padding(innerPadding), uiState = uiState, onEvent = viewModel::processEvent)
+        TaskDetailsContent(
+            modifier =
+                modifier
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding),
+            uiState = uiState,
+            onEvent = viewModel::processEvent,
+        )
     }
 }
 
@@ -115,7 +121,14 @@ private fun TaskDetailsContent(
 
                 Spacer(Modifier.height(24.dp))
 
-                DetailItem(label = stringResource(R.string.due_date), value = task.dueDate.getFormattedDate(context = context, pattern = "MMMM dd, yyyy"))
+                DetailItem(
+                    label = stringResource(R.string.due_date),
+                    value =
+                        task.dueDate.getFormattedDate(
+                            context = context,
+                            pattern = "MMMM dd, yyyy",
+                        ),
+                )
 
                 Spacer(Modifier.height(16.dp))
 

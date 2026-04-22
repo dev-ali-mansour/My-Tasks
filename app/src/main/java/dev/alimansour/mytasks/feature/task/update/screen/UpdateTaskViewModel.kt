@@ -1,4 +1,4 @@
-package dev.alimansour.mytasks.feature.task.add
+package dev.alimansour.mytasks.feature.task.update.screen
 
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
@@ -7,12 +7,12 @@ import dev.alimansour.mytasks.R
 import dev.alimansour.mytasks.core.domain.model.Task
 import dev.alimansour.mytasks.core.domain.model.onError
 import dev.alimansour.mytasks.core.domain.model.onSuccess
-import dev.alimansour.mytasks.core.domain.usecase.AddTaskUseCase
+import dev.alimansour.mytasks.core.domain.usecase.UpdateTaskUseCase
 import dev.alimansour.mytasks.core.ui.utils.UiText
 import dev.alimansour.mytasks.core.ui.utils.toUiText
-import dev.alimansour.mytasks.feature.task.NewTaskEvent
 import dev.alimansour.mytasks.feature.task.TaskEffect
 import dev.alimansour.mytasks.feature.task.TaskState
+import dev.alimansour.mytasks.feature.task.UpdateTaskEvent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,11 +25,11 @@ import org.koin.core.annotation.KoinViewModel
 
 @Stable
 @KoinViewModel
-class NewTaskViewModel(
+class UpdateTaskViewModel(
     private val dispatcher: CoroutineDispatcher,
-    private val addTaskUseCase: AddTaskUseCase,
+    private val updateTaskUseCase: UpdateTaskUseCase,
 ) : ViewModel() {
-    private var addTaskJob: Job? = null
+    private var updateTaskJob: Job? = null
     private val _uiState = MutableStateFlow(TaskState())
     val uiState =
         _uiState
@@ -40,23 +40,34 @@ class NewTaskViewModel(
             )
     val effect = _uiState.map { it.effect }
 
-    fun processEvent(event: NewTaskEvent) {
+    fun processEvent(event: UpdateTaskEvent) {
         when (event) {
-            is NewTaskEvent.UpdateTitle -> {
+            is UpdateTaskEvent.UpdateTitle -> {
                 _uiState.update { it.copy(title = event.title) }
             }
 
-            is NewTaskEvent.UpdateDescription -> {
+            is UpdateTaskEvent.UpdateDescription -> {
                 _uiState.update { it.copy(description = event.description) }
             }
 
-            is NewTaskEvent.UpdateDueDate -> {
+            is UpdateTaskEvent.UpdateDueDate -> {
                 _uiState.update {
                     it.copy(dueDate = event.dueDate)
                 }
             }
 
-            is NewTaskEvent.Proceed -> {
+            is UpdateTaskEvent.LoadTask -> {
+                _uiState.update {
+                    it.copy(
+                        id = event.task.id,
+                        title = event.task.title,
+                        description = event.task.description,
+                        dueDate = event.task.dueDate,
+                    )
+                }
+            }
+
+            is UpdateTaskEvent.Proceed -> {
                 when {
                     uiState.value.title.isBlank() -> {
                         _uiState.update {
@@ -77,28 +88,29 @@ class NewTaskViewModel(
                     }
 
                     else -> {
-                        addTaskJob?.cancel()
-                        addTaskJob = launchAddNewTask()
+                        updateTaskJob?.cancel()
+                        updateTaskJob = launchUpdateTask()
                     }
                 }
             }
 
-            is NewTaskEvent.ConsumeEffect -> {
+            is UpdateTaskEvent.ConsumeEffect -> {
                 _uiState.update { it.copy(effect = null) }
             }
         }
     }
 
-    private fun launchAddNewTask() =
+    private fun launchUpdateTask() =
         viewModelScope.launch(dispatcher) {
             _uiState.update { it.copy(isLoading = true) }
             val task =
                 Task(
+                    id = uiState.value.id,
                     title = uiState.value.title,
                     description = uiState.value.description,
                     dueDate = uiState.value.dueDate,
                 )
-            addTaskUseCase(task).collect { result ->
+            updateTaskUseCase(task).collect { result ->
                 result
                     .onSuccess {
                         _uiState.update {
