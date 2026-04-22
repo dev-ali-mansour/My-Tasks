@@ -18,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,11 +29,13 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import dev.alimansour.mytasks.R
 import dev.alimansour.mytasks.core.domain.model.Task
 import dev.alimansour.mytasks.core.ui.common.CommonTopAppBar
-import dev.alimansour.mytasks.core.ui.common.LaunchedUiEffectHandler
 import dev.alimansour.mytasks.core.ui.theme.MyTasksTheme
 import dev.alimansour.mytasks.core.ui.theme.interFamily
 import dev.alimansour.mytasks.core.ui.utils.UiText
@@ -49,26 +52,27 @@ fun TaskDetailsScreen(
     showError: (message: UiText) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedUiEffectHandler(
-        viewModel.effect,
-        onConsumeEffect = { viewModel.processEvent(TaskDetailsEvent.ConsumeEffect) },
-        onEffect = { effect ->
-            when (effect) {
-                is TaskDetailsEffect.NavigateToUpdateScreen -> {
-                    onUpdateTaskClicked(effect.task)
-                }
+    LaunchedEffect(viewModel.effect, lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.effect.collect { effect ->
+                when (effect) {
+                    is TaskDetailsEffect.NavigateToUpdateScreen -> {
+                        onUpdateTaskClicked(effect.task)
+                    }
 
-                is TaskDetailsEffect.ShowSuccess -> {
-                    onSuccess(UiText.StringResourceId(R.string.task_updated_success))
-                }
+                    is TaskDetailsEffect.ShowSuccess -> {
+                        onSuccess(UiText.StringResourceId(R.string.task_updated_success))
+                    }
 
-                is TaskDetailsEffect.ShowError -> {
-                    showError(effect.message)
+                    is TaskDetailsEffect.ShowError -> {
+                        showError(effect.message)
+                    }
                 }
             }
-        },
-    )
+        }
+    }
 
     Scaffold(topBar = {
         CommonTopAppBar(title = stringResource(id = R.string.task_details)) {

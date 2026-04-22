@@ -8,7 +8,6 @@ import dev.alimansour.mytasks.core.ui.utils.UiText
 data class TaskDetailsState(
     val isLoading: Boolean = false,
     val task: Task? = null,
-    val effect: TaskDetailsEffect? = null,
 )
 
 sealed interface TaskDetailsEffect {
@@ -31,6 +30,4 @@ sealed interface TaskDetailsEvent {
     object UpdateTask : TaskDetailsEvent
 
     object DeleteTask : TaskDetailsEvent
-
-    object ConsumeEffect : TaskDetailsEvent
 }

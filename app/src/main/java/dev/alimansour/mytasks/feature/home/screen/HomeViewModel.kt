@@ -40,7 +40,7 @@ class HomeViewModel(
                 started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000L),
                 initialValue = _uiState.value,
             )
-    private val _effect = Channel<HomeEffect>()
+    private val _effect = Channel<HomeEffect>(capacity = Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
 
     fun processEvent(event: HomeEvent) {

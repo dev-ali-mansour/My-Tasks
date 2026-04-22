@@ -11,7 +11,6 @@ data class TaskState(
     val title: String = "",
     val description: String = "",
     val dueDate: Long = System.currentTimeMillis(),
-    val effect: TaskEffect? = null,
 )
 
 sealed interface TaskEffect {
@@ -36,8 +35,6 @@ sealed interface NewTaskEvent {
     ) : NewTaskEvent
 
     object Proceed : NewTaskEvent
-
-    object ConsumeEffect : NewTaskEvent
 }
 
 sealed interface UpdateTaskEvent {
@@ -58,6 +55,4 @@ sealed interface UpdateTaskEvent {
     ) : UpdateTaskEvent
 
     object Proceed : UpdateTaskEvent
-
-    object ConsumeEffect : UpdateTaskEvent
 }
