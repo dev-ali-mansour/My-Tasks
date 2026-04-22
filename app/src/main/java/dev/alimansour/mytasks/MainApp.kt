@@ -31,7 +31,6 @@ fun MainApp() {
         AppNavHost(
             modifier =
                 Modifier
-                    .padding(innerPadding)
                     .consumeWindowInsets(innerPadding),
             onSuccess = { uiText ->
                 coroutineScope.launch {
