@@ -58,10 +58,6 @@ fun TaskDetailsScreen(
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.effect.collect { effect ->
                 when (effect) {
-                    is TaskDetailsEffect.NavigateToUpdateScreen -> {
-                        onUpdateTaskClicked(effect.task)
-                    }
-
                     is TaskDetailsEffect.ShowSuccess -> {
                         onSuccess(UiText.StringResourceId(R.string.task_updated_success))
                     }
@@ -86,6 +82,7 @@ fun TaskDetailsScreen(
                     .consumeWindowInsets(innerPadding),
             uiState = uiState,
             onEvent = viewModel::processEvent,
+            onUpdateTaskClicked = onUpdateTaskClicked,
         )
     }
 }
@@ -95,6 +92,7 @@ private fun TaskDetailsContent(
     modifier: Modifier = Modifier,
     uiState: TaskDetailsState,
     onEvent: (TaskDetailsEvent) -> Unit,
+    onUpdateTaskClicked: (Task) -> Unit,
 ) {
     val context = LocalContext.current
     uiState.task?.let { task ->
@@ -149,7 +147,7 @@ private fun TaskDetailsContent(
 
             Column {
                 Button(
-                    onClick = { onEvent(TaskDetailsEvent.UpdateTask) },
+                    onClick = { onUpdateTaskClicked(task) },
                     modifier =
                         Modifier
                             .fillMaxWidth(),
@@ -237,6 +235,7 @@ private fun TaskDetailsContentPreview() {
                         ),
                 ),
             onEvent = {},
+            onUpdateTaskClicked = {},
         )
     }
 }
