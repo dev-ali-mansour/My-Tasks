@@ -35,7 +35,7 @@ class TasksRepositoryImpl(
             .map<TaskEntity?, Result<Task, DataError.Local>> { taskEntity ->
                 taskEntity?.let {
                     Result.Success(it.toTask())
-                } ?: Result.Error(DataError.Local.DATABASE_READ_ERROR)
+                } ?: Result.Error(DataError.Local.NOT_FOUND)
             }.catch {
                 // Log the exception 'it' if needed
                 emit(Result.Error(DataError.Local.DATABASE_READ_ERROR))
