@@ -73,12 +73,6 @@ class TaskDetailsViewModel(
     fun processEvent(event: TaskDetailsEvent) {
         viewModelScope.launch {
             when (event) {
-                is TaskDetailsEvent.UpdateTask -> {
-                    _uiState.value.task?.let { task ->
-                        _effect.send(TaskDetailsEffect.NavigateToUpdateScreen(task))
-                    }
-                }
-
                 is TaskDetailsEvent.DeleteTask -> {
                     _uiState.value.task?.let { task ->
                         deleteTaskJob?.cancel()

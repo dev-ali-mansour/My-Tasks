@@ -78,29 +78,6 @@ class TaskDetailsViewModelTest {
         }
 
     @Test
-    fun `UpdateTask with existing task emits navigation effect`() =
-        runTest(testDispatcher) {
-            // GIVEN
-            val effects = mutableListOf<TaskDetailsEffect>()
-            val job = launch { viewModel.uiState.collect { } }
-            val effectJob = launch { viewModel.effect.collect { effects.add(it) } }
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            // WHEN
-            viewModel.processEvent(TaskDetailsEvent.UpdateTask)
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            // THEN
-            assertTrue(effects.isNotEmpty())
-            assertTrue(effects.last() is TaskDetailsEffect.NavigateToUpdateScreen)
-            val effect = effects.last() as TaskDetailsEffect.NavigateToUpdateScreen
-            assertEquals(sampleTask, effect.task)
-
-            job.cancel()
-            effectJob.cancel()
-        }
-
-    @Test
     fun `DeleteTask success sets loading then emits ShowSuccess effect`() =
         runTest(testDispatcher) {
             // GIVEN
