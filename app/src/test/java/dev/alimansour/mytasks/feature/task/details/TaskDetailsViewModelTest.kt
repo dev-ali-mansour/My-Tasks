@@ -1,20 +1,25 @@
 package dev.alimansour.mytasks.feature.task.details
 
+import androidx.lifecycle.SavedStateHandle
+import androidx.navigation.toRoute
 import dev.alimansour.mytasks.core.domain.model.DataError
 import dev.alimansour.mytasks.core.domain.model.Result
 import dev.alimansour.mytasks.core.domain.model.Task
 import dev.alimansour.mytasks.core.domain.usecase.DeleteTaskUseCase
+import dev.alimansour.mytasks.core.domain.usecase.GetTaskByIdUseCase
+import dev.alimansour.mytasks.core.ui.navigation.Route
 import dev.alimansour.mytasks.core.ui.utils.toUiText
 import dev.alimansour.mytasks.feature.task.details.screen.TaskDetailsEffect
 import dev.alimansour.mytasks.feature.task.details.screen.TaskDetailsEvent
 import dev.alimansour.mytasks.feature.task.details.screen.TaskDetailsViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -24,7 +29,6 @@ import kotlinx.coroutines.test.setMain
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -33,6 +37,8 @@ import org.junit.jupiter.api.Test
 class TaskDetailsViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     private val deleteTaskUseCase: DeleteTaskUseCase = mockk()
+    private val getTaskByIdUseCase: GetTaskByIdUseCase = mockk()
+    private val savedStateHandle: SavedStateHandle = mockk()
     private lateinit var viewModel: TaskDetailsViewModel
 
     private val sampleTask = Task(id = 1, title = "Title", description = "Desc", dueDate = 123L, isCompleted = false)
@@ -40,57 +46,33 @@ class TaskDetailsViewModelTest {
     @BeforeEach
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = TaskDetailsViewModel(testDispatcher, deleteTaskUseCase)
+        mockkStatic("androidx.navigation.SavedStateHandleKt")
+        every { savedStateHandle.toRoute<Route.TaskDetails>() } returns Route.TaskDetails(sampleTask.id)
+        every { getTaskByIdUseCase(any()) } returns flowOf(Result.Success(sampleTask))
+        viewModel = TaskDetailsViewModel(
+            savedStateHandle = savedStateHandle,
+            dispatcher = testDispatcher,
+            deleteTaskUseCase = deleteTaskUseCase,
+            getTaskByIdUseCase = getTaskByIdUseCase
+        )
     }
 
     @AfterEach
     fun tearDown() {
+        unmockkStatic("androidx.navigation.SavedStateHandleKt")
         Dispatchers.resetMain()
     }
 
     @Test
-    fun `initial state has no task and not loading`() =
+    fun `initialization loads task from database`() =
         runTest(testDispatcher) {
-            // THEN
-            val initial = viewModel.uiState.value
-            assertFalse(initial.isLoading)
-            assertNull(initial.task)
-        }
-
-    @Test
-    fun `LoadTask sets task without altering loading`() =
-        runTest(testDispatcher) {
-            // GIVEN
             val job = launch { viewModel.uiState.collect { } }
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            // WHEN
-            viewModel.processEvent(TaskDetailsEvent.LoadTask(sampleTask))
             testDispatcher.scheduler.advanceUntilIdle()
 
             // THEN
             val state = viewModel.uiState.value
-            assertEquals(sampleTask, state.task)
             assertFalse(state.isLoading)
-
-            job.cancel()
-        }
-
-    @Test
-    fun `LoadTask overwrites previously loaded task`() =
-        runTest(testDispatcher) {
-            // GIVEN
-            val job = launch { viewModel.uiState.collect { } }
-            val oldTask = sampleTask.copy(id = 99)
-            viewModel.processEvent(TaskDetailsEvent.LoadTask(oldTask))
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            // WHEN
-            viewModel.processEvent(TaskDetailsEvent.LoadTask(sampleTask))
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            // THEN
-            assertEquals(sampleTask, viewModel.uiState.value.task)
+            assertEquals(sampleTask, state.task)
 
             job.cancel()
         }
@@ -100,8 +82,8 @@ class TaskDetailsViewModelTest {
         runTest(testDispatcher) {
             // GIVEN
             val effects = mutableListOf<TaskDetailsEffect>()
+            val job = launch { viewModel.uiState.collect { } }
             val effectJob = launch { viewModel.effect.collect { effects.add(it) } }
-            viewModel.processEvent(TaskDetailsEvent.LoadTask(sampleTask))
             testDispatcher.scheduler.advanceUntilIdle()
 
             // WHEN
@@ -114,43 +96,7 @@ class TaskDetailsViewModelTest {
             val effect = effects.last() as TaskDetailsEffect.NavigateToUpdateScreen
             assertEquals(sampleTask, effect.task)
 
-            effectJob.cancel()
-        }
-
-    @Test
-    fun `UpdateTask with null task does nothing`() =
-        runTest(testDispatcher) {
-            // GIVEN
-            val effects = mutableListOf<TaskDetailsEffect>()
-            val effectJob = launch { viewModel.effect.collect { effects.add(it) } }
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            // WHEN
-            viewModel.processEvent(TaskDetailsEvent.UpdateTask)
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            // THEN
-            assertTrue(effects.isEmpty())
-
-            effectJob.cancel()
-        }
-
-    @Test
-    fun `DeleteTask with null task does not invoke use case`() =
-        runTest(testDispatcher) {
-            // GIVEN
-            val effects = mutableListOf<TaskDetailsEffect>()
-            val effectJob = launch { viewModel.effect.collect { effects.add(it) } }
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            // WHEN
-            viewModel.processEvent(TaskDetailsEvent.DeleteTask)
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            // THEN
-            coVerify(exactly = 0) { deleteTaskUseCase.invoke(any()).let { } }
-            assertTrue(effects.isEmpty())
-
+            job.cancel()
             effectJob.cancel()
         }
 
@@ -159,10 +105,11 @@ class TaskDetailsViewModelTest {
         runTest(testDispatcher) {
             // GIVEN
             val effects = mutableListOf<TaskDetailsEffect>()
+            val job = launch { viewModel.uiState.collect { } }
             val effectJob = launch { viewModel.effect.collect { effects.add(it) } }
-            viewModel.processEvent(TaskDetailsEvent.LoadTask(sampleTask))
             val successFlow = flowOf(Result.Success(Unit))
             coEvery { deleteTaskUseCase(sampleTask) } returns successFlow
+            testDispatcher.scheduler.advanceUntilIdle()
 
             // WHEN
             viewModel.processEvent(TaskDetailsEvent.DeleteTask)
@@ -174,6 +121,7 @@ class TaskDetailsViewModelTest {
             assertTrue(effects.isNotEmpty())
             assertEquals(TaskDetailsEffect.ShowSuccess, effects.last())
 
+            job.cancel()
             effectJob.cancel()
         }
 
@@ -182,10 +130,11 @@ class TaskDetailsViewModelTest {
         runTest(testDispatcher) {
             // GIVEN
             val effects = mutableListOf<TaskDetailsEffect>()
+            val job = launch { viewModel.uiState.collect { } }
             val effectJob = launch { viewModel.effect.collect { effects.add(it) } }
-            viewModel.processEvent(TaskDetailsEvent.LoadTask(sampleTask))
             val error = DataError.Local.DATABASE_WRITE_ERROR
             coEvery { deleteTaskUseCase(sampleTask) } returns flowOf(Result.Error(error))
+            testDispatcher.scheduler.advanceUntilIdle()
 
             // WHEN
             viewModel.processEvent(TaskDetailsEvent.DeleteTask)
@@ -201,87 +150,7 @@ class TaskDetailsViewModelTest {
             val expected = error.toUiText()
             assertEquals(expected::class, effect.message::class)
 
-            effectJob.cancel()
-        }
-
-    @Test
-    fun `DeleteTask called twice invokes use case twice and stays loading until emission`() =
-        runTest(testDispatcher) {
-            // GIVEN
-            val effects = mutableListOf<TaskDetailsEffect>()
-            val effectJob = launch { viewModel.effect.collect { effects.add(it) } }
-            viewModel.processEvent(TaskDetailsEvent.LoadTask(sampleTask))
-            val shared = MutableSharedFlow<Result<Unit, DataError.Local>>()
-            coEvery { deleteTaskUseCase(sampleTask) } returns shared
-
-            // WHEN
-            viewModel.processEvent(TaskDetailsEvent.DeleteTask)
-            viewModel.processEvent(TaskDetailsEvent.DeleteTask)
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            // THEN
-            coVerify(atLeast = 1) { deleteTaskUseCase(sampleTask).let { } }
-
-            // WHEN
-            shared.emit(Result.Success(Unit))
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            // THEN
-            assertFalse(viewModel.uiState.value.isLoading)
-            assertTrue(effects.isNotEmpty())
-            assertEquals(TaskDetailsEffect.ShowSuccess, effects.last())
-
-            effectJob.cancel()
-        }
-
-    @Test
-    fun `DeleteTask multi emission final effect reflects last emission`() =
-        runTest(testDispatcher) {
-            // GIVEN
-            val effects = mutableListOf<TaskDetailsEffect>()
-            val effectJob = launch { viewModel.effect.collect { effects.add(it) } }
-            viewModel.processEvent(TaskDetailsEvent.LoadTask(sampleTask))
-            val flowMulti =
-                flow {
-                    emit(Result.Success(Unit))
-                    emit(Result.Error(DataError.Local.DATABASE_WRITE_ERROR))
-                }
-            coEvery { deleteTaskUseCase(sampleTask) } returns flowMulti
-
-            // WHEN
-            viewModel.processEvent(TaskDetailsEvent.DeleteTask)
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            // THEN
-            assertTrue(effects.isNotEmpty())
-            assertTrue(effects.last() is TaskDetailsEffect.ShowError)
-
-            effectJob.cancel()
-        }
-
-    @Test
-    fun `DeleteTask sets loading true before emission then false after result`() =
-        runTest(testDispatcher) {
-            // GIVEN
-            val job = launch { viewModel.uiState.collect { } }
-            viewModel.processEvent(TaskDetailsEvent.LoadTask(sampleTask))
-            val shared = MutableSharedFlow<Result<Unit, DataError.Local>>()
-            coEvery { deleteTaskUseCase(sampleTask) } returns shared
-
-            // WHEN
-            viewModel.processEvent(TaskDetailsEvent.DeleteTask)
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            // THEN
-            assertTrue(viewModel.uiState.value.isLoading)
-
-            // WHEN
-            shared.emit(Result.Success(Unit))
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            // THEN
-            assertFalse(viewModel.uiState.value.isLoading)
-
             job.cancel()
+            effectJob.cancel()
         }
 }
