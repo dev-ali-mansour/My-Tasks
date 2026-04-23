@@ -23,10 +23,6 @@ sealed interface TaskDetailsEffect {
 }
 
 sealed interface TaskDetailsEvent {
-    data class LoadTask(
-        val task: Task,
-    ) : TaskDetailsEvent
-
     object UpdateTask : TaskDetailsEvent
 
     object DeleteTask : TaskDetailsEvent

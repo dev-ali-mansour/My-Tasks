@@ -50,9 +50,5 @@ sealed interface UpdateTaskEvent {
         val dueDate: Long,
     ) : UpdateTaskEvent
 
-    data class LoadTask(
-        val task: Task,
-    ) : UpdateTaskEvent
-
     object Proceed : UpdateTaskEvent
 }
