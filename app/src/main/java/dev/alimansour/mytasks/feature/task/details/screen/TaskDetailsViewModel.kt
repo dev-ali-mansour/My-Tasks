@@ -17,6 +17,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -32,11 +33,11 @@ class TaskDetailsViewModel(
     private val getTaskByIdUseCase: GetTaskByIdUseCase,
 ) : ViewModel() {
     private val taskId = savedStateHandle.toRoute<Route.TaskDetails>().taskId
-    private var loadTaskJob: Job? = null
     private var deleteTaskJob: Job? = null
     private val _uiState = MutableStateFlow(TaskDetailsState())
     val uiState =
         _uiState
+            .onStart { loadTask() }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000L),
@@ -45,34 +46,34 @@ class TaskDetailsViewModel(
     private val _effect = Channel<TaskDetailsEffect>(capacity = Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
 
-    init {
-        loadTask()
-    }
-
     private fun loadTask() {
-        loadTaskJob?.cancel()
-        loadTaskJob =
-            viewModelScope.launch(dispatcher) {
-                _uiState.update { it.copy(isLoading = true) }
-                getTaskByIdUseCase(taskId).collect { result ->
-                    result
-                        .onSuccess { task ->
-                            _uiState.update {
-                                it.copy(isLoading = false, task = task)
-                            }
-                        }.onError { error ->
-                            _uiState.update {
-                                it.copy(isLoading = false)
-                            }
-                            _effect.send(TaskDetailsEffect.ShowError(message = error.toUiText()))
+        viewModelScope.launch(dispatcher) {
+            _uiState.update { it.copy(isLoading = true) }
+            getTaskByIdUseCase(taskId).collect { result ->
+                result
+                    .onSuccess { task ->
+                        _uiState.update {
+                            it.copy(isLoading = false, task = task)
                         }
-                }
+                    }.onError { error ->
+                        _uiState.update {
+                            it.copy(isLoading = false)
+                        }
+                        _effect.send(TaskDetailsEffect.ShowError(message = error.toUiText()))
+                    }
             }
+        }
     }
 
     fun processEvent(event: TaskDetailsEvent) {
         viewModelScope.launch {
             when (event) {
+                is TaskDetailsEvent.UpdateTask -> {
+                    _uiState.value.task?.let { task ->
+                        _effect.send(TaskDetailsEffect.NavigateToUpdateScreen(task))
+                    }
+                }
+
                 is TaskDetailsEvent.DeleteTask -> {
                     _uiState.value.task?.let { task ->
                         deleteTaskJob?.cancel()
