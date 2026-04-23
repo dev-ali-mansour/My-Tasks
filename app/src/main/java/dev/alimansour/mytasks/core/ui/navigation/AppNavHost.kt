@@ -12,20 +12,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dev.alimansour.mytasks.core.ui.utils.UiText
 import dev.alimansour.mytasks.feature.home.screen.HomeScreen
-import dev.alimansour.mytasks.feature.task.SelectedTaskViewModel
-import dev.alimansour.mytasks.feature.task.UpdateTaskEvent
 import dev.alimansour.mytasks.feature.task.add.screen.NewTaskScreen
-import dev.alimansour.mytasks.feature.task.details.screen.TaskDetailsEvent
 import dev.alimansour.mytasks.feature.task.details.screen.TaskDetailsScreen
-import dev.alimansour.mytasks.feature.task.details.screen.TaskDetailsViewModel
 import dev.alimansour.mytasks.feature.task.update.screen.UpdateTaskScreen
-import dev.alimansour.mytasks.feature.task.update.screen.UpdateTaskViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun AppNavHost(
     modifier: Modifier = Modifier,
-    selectedTaskViewModel: SelectedTaskViewModel = koinViewModel(),
     onSuccess: (message: UiText) -> Unit,
     showError: (message: UiText) -> Unit,
 ) {
@@ -42,8 +36,7 @@ fun AppNavHost(
                     navController.navigate(it)
                 },
                 navigateToTaskDetails = {
-                    selectedTaskViewModel.onSelectTask(it)
-                    navController.navigate(Route.TaskDetails)
+                    navController.navigate(Route.TaskDetails(it.id))
                 },
                 onFabClick = { navController.navigate(Route.NewTask) },
                 showError = showError,
@@ -62,20 +55,10 @@ fun AppNavHost(
         }
 
         composable<Route.TaskDetails> {
-            val viewModel: TaskDetailsViewModel = koinViewModel()
-            val selectedTask by selectedTaskViewModel.selectedTask.collectAsStateWithLifecycle()
-
-            LaunchedEffect(selectedTask) {
-                selectedTask?.let { task ->
-                    viewModel.processEvent(TaskDetailsEvent.LoadTask(task))
-                }
-            }
-
             TaskDetailsScreen(
                 onNavigationIconClicked = { navController.navigateUpSafely() },
                 onUpdateTaskClicked = {
-                    selectedTaskViewModel.onSelectTask(it)
-                    navController.navigate(Route.UpdateTask)
+                    navController.navigate(Route.UpdateTask(it.id))
                 },
                 onSuccess = {
                     onSuccess(it)
@@ -86,15 +69,6 @@ fun AppNavHost(
         }
 
         composable<Route.UpdateTask> {
-            val viewModel: UpdateTaskViewModel = koinViewModel()
-            val selectedTask by selectedTaskViewModel.selectedTask.collectAsStateWithLifecycle()
-
-            LaunchedEffect(selectedTask) {
-                selectedTask?.let { task ->
-                    viewModel.processEvent(UpdateTaskEvent.LoadTask(task))
-                }
-            }
-
             UpdateTaskScreen(
                 onNavigationIconClicked = { navController.navigateUpSafely() },
                 onSuccess = {
