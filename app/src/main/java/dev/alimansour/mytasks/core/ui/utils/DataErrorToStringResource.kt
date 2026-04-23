@@ -18,7 +18,10 @@ fun DataError.toUiText(): UiText {
             DataError.Remote.FirebaseAuthUserCollision -> R.string.core_ui_error_user_collision
             DataError.Remote.UNKNOWN -> R.string.core_ui_error_generic
             DataError.Local.DISK_FULL -> R.string.core_ui_error_disk_full
-            DataError.Local.UNKNOWN, DataError.Local.DATABASE_READ_ERROR, DataError.Local.DATABASE_WRITE_ERROR ->
+            DataError.Local.UNKNOWN,
+            DataError.Local.DATABASE_READ_ERROR,
+            DataError.Local.DATABASE_WRITE_ERROR,
+            DataError.Local.NOT_FOUND ->
                 R.string.core_ui_error_generic
         }
     return UiText.StringResourceId(stringRes)
