@@ -11,8 +11,8 @@ sealed class Route {
     data object NewTask : Route()
 
     @Serializable
-    data object TaskDetails : Route()
+    data class TaskDetails(val taskId: Long) : Route()
 
     @Serializable
-    data object UpdateTask : Route()
+    data class UpdateTask(val taskId: Long) : Route()
 }

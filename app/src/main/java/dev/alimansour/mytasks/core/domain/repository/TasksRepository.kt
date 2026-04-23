@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.Flow
 interface TasksRepository {
     fun getTasks(): Flow<Result<List<Task>, DataError.Local>>
 
+    fun getTaskById(id: Long): Flow<Result<Task, DataError.Local>>
+
     fun addTask(task: Task): Flow<Result<Unit, DataError.Local>>
 
     fun updateTask(task: Task): Flow<Result<Unit, DataError.Local>>

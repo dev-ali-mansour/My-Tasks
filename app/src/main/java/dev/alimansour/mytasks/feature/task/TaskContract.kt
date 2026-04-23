@@ -7,6 +7,7 @@ import dev.alimansour.mytasks.core.ui.utils.UiText
 @Stable
 data class TaskState(
     val isLoading: Boolean = false,
+    val isInitialized: Boolean = false,
     val id: Long = 0,
     val title: String = "",
     val description: String = "",
@@ -48,10 +49,6 @@ sealed interface UpdateTaskEvent {
 
     data class UpdateDueDate(
         val dueDate: Long,
-    ) : UpdateTaskEvent
-
-    data class LoadTask(
-        val task: Task,
     ) : UpdateTaskEvent
 
     object Proceed : UpdateTaskEvent
