@@ -54,8 +54,13 @@ fun MyTasksTheme(
                 if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
             }
 
-            darkTheme -> DarkColorScheme
-            else -> LightColorScheme
+            darkTheme -> {
+                DarkColorScheme
+            }
+
+            else -> {
+                LightColorScheme
+            }
         }
 
     MaterialTheme(
