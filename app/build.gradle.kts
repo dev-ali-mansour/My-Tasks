@@ -22,7 +22,7 @@ val dynamicVersionName: String? = System.getenv("VERSION_NAME")
 
 android {
     namespace = "dev.alimansour.mytasks"
-    compileSdk = 36
+    compileSdk = 37
 
     signingConfigs {
         if (!project.getSecret("KEYSTORE_PASSWORD").isNullOrEmpty()) {
@@ -52,7 +52,7 @@ android {
     defaultConfig {
         applicationId = "dev.alimansour.mytasks"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 37
         versionCode = dynamicVersionCode ?: 1
         versionName = dynamicVersionName ?: "1.0.0"
 
