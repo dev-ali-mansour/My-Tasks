@@ -51,7 +51,7 @@ android {
     defaultConfig {
         applicationId = "dev.alimansour.mytasks"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 37
         versionCode = dynamicVersionCode ?: 1
         versionName = dynamicVersionName ?: "1.0.0"
 
