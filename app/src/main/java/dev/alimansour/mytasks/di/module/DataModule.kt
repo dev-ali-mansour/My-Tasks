@@ -10,7 +10,7 @@ import org.koin.core.annotation.Single
 
 @Module
 @Configuration
-class DataModule {
+class RoomModule {
     @Single
     fun provideTasksDatabase(context: Context): TasksDatabase =
         Room
