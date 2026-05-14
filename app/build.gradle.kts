@@ -51,7 +51,7 @@ android {
     defaultConfig {
         applicationId = "dev.alimansour.mytasks"
         minSdk = 24
-        targetSdk = 37
+        targetSdk = 36
         versionCode = dynamicVersionCode ?: 1
         versionName = dynamicVersionName ?: "1.0.0"
 
@@ -66,8 +66,7 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            isMinifyEnabled = false
             isDebuggable = false
             if ("release" in signingConfigs.names) {
                 signingConfig = signingConfigs.getByName("release")
@@ -81,6 +80,11 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
+    }
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
+        }
     }
     buildFeatures {
         compose = true
@@ -106,12 +110,6 @@ android {
         getByName("test") {
             resources.directories += "src/test/resources"
         }
-    }
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_21)
     }
 }
 
@@ -199,7 +197,6 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.navigation)
-    implementation(libs.splashScreen)
     implementation(libs.androidx.lifecycle.runtimeCompose)
     implementation(libs.androidx.lifecycle.viewModelCompose)
     implementation(libs.timber)
