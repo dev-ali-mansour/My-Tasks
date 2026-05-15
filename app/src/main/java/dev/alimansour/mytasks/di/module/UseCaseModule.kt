@@ -3,6 +3,7 @@ package dev.alimansour.mytasks.di.module
 import dev.alimansour.mytasks.core.domain.repository.TasksRepository
 import dev.alimansour.mytasks.core.domain.usecase.AddTaskUseCase
 import dev.alimansour.mytasks.core.domain.usecase.DeleteTaskUseCase
+import dev.alimansour.mytasks.core.domain.usecase.GetTaskByIdUseCase
 import dev.alimansour.mytasks.core.domain.usecase.GetTasksUseCase
 import dev.alimansour.mytasks.core.domain.usecase.UpdateTaskUseCase
 import org.koin.core.annotation.Configuration
@@ -20,6 +21,9 @@ class UseCaseModule {
 
     @Single
     fun provideDeleteTaskUseCase(repository: TasksRepository) = DeleteTaskUseCase(repository)
+
+    @Single
+    fun provideGetTaskByIdUseCase(repository: TasksRepository) = GetTaskByIdUseCase(repository)
 
     @Single
     fun provideGetTasksUseCase(repository: TasksRepository) = GetTasksUseCase(repository)

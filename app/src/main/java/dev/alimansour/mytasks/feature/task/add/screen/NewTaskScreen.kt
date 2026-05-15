@@ -1,15 +1,18 @@
-package dev.alimansour.mytasks.feature.task.add
+package dev.alimansour.mytasks.feature.task.add.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,6 +32,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,10 +47,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import dev.alimansour.mytasks.R
 import dev.alimansour.mytasks.core.ui.common.CommonTopAppBar
-import dev.alimansour.mytasks.core.ui.common.LaunchedUiEffectHandler
 import dev.alimansour.mytasks.core.ui.theme.MyTasksTheme
 import dev.alimansour.mytasks.core.ui.theme.interFamily
 import dev.alimansour.mytasks.core.ui.utils.UiText
@@ -65,37 +71,45 @@ fun NewTaskScreen(
     showError: (message: UiText) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedUiEffectHandler(
-        viewModel.effect,
-        onConsumeEffect = { viewModel.processEvent(NewTaskEvent.ConsumeEffect) },
-        onEffect = { effect ->
-            when (effect) {
-                is TaskEffect.ShowSuccess -> {
-                    onSuccess(UiText.StringResourceId(R.string.task_add_success))
-                }
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.effect.collect { effect ->
+                when (effect) {
+                    is TaskEffect.ShowSuccess -> {
+                        onSuccess(UiText.StringResourceId(R.string.task_add_success))
+                    }
 
-                is TaskEffect.ShowError -> {
-                    showError(effect.message)
+                    is TaskEffect.ShowError -> {
+                        showError(effect.message)
+                    }
                 }
             }
-        },
-    )
+        }
+    }
 
-    Scaffold(topBar = {
-        CommonTopAppBar(
-            title = stringResource(id = R.string.new_task),
-            onNavigationIconClicked = onNavigationIconClicked,
+    Scaffold(
+        topBar = {
+            CommonTopAppBar(
+                title = stringResource(id = R.string.new_task),
+                onNavigationIconClicked = onNavigationIconClicked,
+            )
+        }) { innerPadding ->
+
+        NewTaskContent(
+            modifier = modifier,
+            innerPadding = innerPadding,
+            uiState = uiState,
+            onEvent = viewModel::processEvent,
         )
-    }) { innerPadding ->
-
-        NewTaskContent(modifier = modifier.padding(innerPadding), uiState = uiState, onEvent = viewModel::processEvent)
     }
 }
 
 @Composable
 private fun NewTaskContent(
     modifier: Modifier = Modifier,
+    innerPadding: PaddingValues = PaddingValues(0.dp),
     uiState: TaskState,
     onEvent: (NewTaskEvent) -> Unit,
 ) {
@@ -119,10 +133,13 @@ private fun NewTaskContent(
     Column(
         modifier =
             modifier
-                .padding(16.dp)
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .verticalScroll(rememberScrollState()),
+                .consumeWindowInsets(innerPadding)
+                .imePadding()
+                .verticalScroll(rememberScrollState())
+                .padding(innerPadding)
+                .padding(16.dp),
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
         Column {

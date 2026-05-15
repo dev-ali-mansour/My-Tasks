@@ -7,11 +7,11 @@ import dev.alimansour.mytasks.core.ui.utils.UiText
 @Stable
 data class TaskState(
     val isLoading: Boolean = false,
+    val isInitialized: Boolean = false,
     val id: Long = 0,
     val title: String = "",
     val description: String = "",
     val dueDate: Long = System.currentTimeMillis(),
-    val effect: TaskEffect? = null,
 )
 
 sealed interface TaskEffect {
@@ -36,8 +36,6 @@ sealed interface NewTaskEvent {
     ) : NewTaskEvent
 
     object Proceed : NewTaskEvent
-
-    object ConsumeEffect : NewTaskEvent
 }
 
 sealed interface UpdateTaskEvent {
@@ -53,11 +51,5 @@ sealed interface UpdateTaskEvent {
         val dueDate: Long,
     ) : UpdateTaskEvent
 
-    data class LoadTask(
-        val task: Task,
-    ) : UpdateTaskEvent
-
     object Proceed : UpdateTaskEvent
-
-    object ConsumeEffect : UpdateTaskEvent
 }

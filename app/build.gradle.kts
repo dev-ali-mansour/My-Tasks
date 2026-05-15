@@ -1,4 +1,3 @@
-
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 
@@ -6,9 +5,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.koin.compiler)
     alias(libs.plugins.room)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.koin.compiler)
     alias(libs.plugins.junit5)
     alias(libs.plugins.jacoco)
 }
@@ -22,7 +21,7 @@ val dynamicVersionName: String? = System.getenv("VERSION_NAME")
 
 android {
     namespace = "dev.alimansour.mytasks"
-    compileSdk = 36
+    compileSdk = 37
 
     signingConfigs {
         if (!project.getSecret("KEYSTORE_PASSWORD").isNullOrEmpty()) {
@@ -52,7 +51,7 @@ android {
     defaultConfig {
         applicationId = "dev.alimansour.mytasks"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 37
         versionCode = dynamicVersionCode ?: 1
         versionName = dynamicVersionName ?: "1.0.0"
 
@@ -92,7 +91,6 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
-
     testOptions {
         unitTests.all {
             it.useJUnitPlatform()
@@ -103,10 +101,9 @@ android {
             isReturnDefaultValues = true
         }
     }
-
     sourceSets {
         getByName("test") {
-            resources.directories.add("src/test/resources")
+            resources.directories += "src/test/resources"
         }
     }
 }
@@ -186,10 +183,8 @@ tasks.withType<Test>().configureEach {
     }
 }
 
-junitPlatform {
-    jacocoOptions {
-        taskGenerationEnabled = false
-    }
+koinCompiler {
+    compileSafety = true
 }
 
 dependencies {
@@ -202,7 +197,9 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.navigation)
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     implementation(libs.splashScreen)
     implementation(libs.androidx.lifecycle.runtimeCompose)
     implementation(libs.androidx.lifecycle.viewModelCompose)
