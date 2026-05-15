@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.defaultMinSize
@@ -88,18 +89,17 @@ fun NewTaskScreen(
         }
     }
 
-    Scaffold(topBar = {
-        CommonTopAppBar(
-            title = stringResource(id = R.string.new_task),
-            onNavigationIconClicked = onNavigationIconClicked,
-        )
-    }) { innerPadding ->
+    Scaffold(
+        topBar = {
+            CommonTopAppBar(
+                title = stringResource(id = R.string.new_task),
+                onNavigationIconClicked = onNavigationIconClicked,
+            )
+        }) { innerPadding ->
 
         NewTaskContent(
-            modifier =
-                modifier
-                    .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding),
+            modifier = modifier,
+            innerPadding = innerPadding,
             uiState = uiState,
             onEvent = viewModel::processEvent,
         )
@@ -109,6 +109,7 @@ fun NewTaskScreen(
 @Composable
 private fun NewTaskContent(
     modifier: Modifier = Modifier,
+    innerPadding: PaddingValues = PaddingValues(0.dp),
     uiState: TaskState,
     onEvent: (NewTaskEvent) -> Unit,
 ) {
@@ -132,11 +133,13 @@ private fun NewTaskContent(
     Column(
         modifier =
             modifier
-                .padding(16.dp)
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
+                .consumeWindowInsets(innerPadding)
                 .imePadding()
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .padding(innerPadding)
+                .padding(16.dp),
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
         Column {
