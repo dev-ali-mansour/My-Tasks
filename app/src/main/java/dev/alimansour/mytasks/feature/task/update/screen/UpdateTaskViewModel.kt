@@ -1,17 +1,14 @@
 package dev.alimansour.mytasks.feature.task.update.screen
 
 import androidx.compose.runtime.Stable
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
 import dev.alimansour.mytasks.R
 import dev.alimansour.mytasks.core.domain.model.Task
 import dev.alimansour.mytasks.core.domain.model.onError
 import dev.alimansour.mytasks.core.domain.model.onSuccess
 import dev.alimansour.mytasks.core.domain.usecase.GetTaskByIdUseCase
 import dev.alimansour.mytasks.core.domain.usecase.UpdateTaskUseCase
-import dev.alimansour.mytasks.core.ui.navigation.Route
 import dev.alimansour.mytasks.core.ui.utils.UiText
 import dev.alimansour.mytasks.core.ui.utils.toUiText
 import dev.alimansour.mytasks.feature.task.TaskEffect
@@ -22,26 +19,28 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 
 @Stable
 @KoinViewModel
 class UpdateTaskViewModel(
-    savedStateHandle: SavedStateHandle,
+    @InjectedParam private val taskId: Long,
     private val dispatcher: CoroutineDispatcher,
     private val updateTaskUseCase: UpdateTaskUseCase,
     private val getTaskByIdUseCase: GetTaskByIdUseCase,
 ) : ViewModel() {
-    private val taskId = savedStateHandle.toRoute<Route.UpdateTask>().taskId
     private var loadTaskJob: Job? = null
     private var updateTaskJob: Job? = null
     private val _uiState = MutableStateFlow(TaskState())
     val uiState =
         _uiState
+            .onStart { loadTask() }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000L),
@@ -49,10 +48,6 @@ class UpdateTaskViewModel(
             )
     private val _effect = Channel<TaskEffect>(capacity = Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
-
-    init {
-        loadTask()
-    }
 
     private fun loadTask() {
         loadTaskJob?.cancel()
