@@ -35,17 +35,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import dev.alimansour.mytasks.R
 import dev.alimansour.mytasks.core.domain.model.Task
+import dev.alimansour.mytasks.core.ui.navigation.Route
 import dev.alimansour.mytasks.core.ui.common.CommonTopAppBar
 import dev.alimansour.mytasks.core.ui.theme.MyTasksTheme
 import dev.alimansour.mytasks.core.ui.theme.interFamily
 import dev.alimansour.mytasks.core.ui.utils.UiText
 import dev.alimansour.mytasks.core.ui.utils.getFormattedDate
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun TaskDetailsScreen(
     modifier: Modifier = Modifier,
-    viewModel: TaskDetailsViewModel = koinViewModel(),
+    viewModel: TaskDetailsViewModel,
     onNavigationIconClicked: () -> Unit,
     onUpdateTaskClicked: (Task) -> Unit,
     onSuccess: (message: UiText) -> Unit,

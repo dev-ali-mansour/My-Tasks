@@ -1,9 +1,10 @@
 package dev.alimansour.mytasks.core.ui.navigation
 
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class Route {
+sealed class Route : NavKey {
     @Serializable
     data object Home : Route()
 

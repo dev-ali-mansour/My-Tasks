@@ -59,12 +59,11 @@ import dev.alimansour.mytasks.core.ui.utils.getFormattedDate
 import dev.alimansour.mytasks.feature.task.TaskEffect
 import dev.alimansour.mytasks.feature.task.TaskState
 import dev.alimansour.mytasks.feature.task.UpdateTaskEvent
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun UpdateTaskScreen(
     modifier: Modifier = Modifier,
-    viewModel: UpdateTaskViewModel = koinViewModel(),
+    viewModel: UpdateTaskViewModel,
     onNavigationIconClicked: () -> Unit,
     onSuccess: (message: UiText) -> Unit,
     showError: (message: UiText) -> Unit,

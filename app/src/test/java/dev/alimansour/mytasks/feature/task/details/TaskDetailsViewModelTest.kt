@@ -1,7 +1,5 @@
 package dev.alimansour.mytasks.feature.task.details
 
-import androidx.lifecycle.SavedStateHandle
-import androidx.navigation.toRoute
 import dev.alimansour.mytasks.core.domain.model.DataError
 import dev.alimansour.mytasks.core.domain.model.Result
 import dev.alimansour.mytasks.core.domain.model.Task
@@ -16,8 +14,6 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkStatic
-import io.mockk.unmockkStatic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -38,7 +34,6 @@ class TaskDetailsViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     private val deleteTaskUseCase: DeleteTaskUseCase = mockk()
     private val getTaskByIdUseCase: GetTaskByIdUseCase = mockk()
-    private val savedStateHandle: SavedStateHandle = mockk()
     private lateinit var viewModel: TaskDetailsViewModel
 
     private val sampleTask = Task(id = 1, title = "Title", description = "Desc", dueDate = 123L, isCompleted = false)
@@ -46,11 +41,9 @@ class TaskDetailsViewModelTest {
     @BeforeEach
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        mockkStatic("androidx.navigation.SavedStateHandleKt")
-        every { savedStateHandle.toRoute<Route.TaskDetails>() } returns Route.TaskDetails(sampleTask.id)
         every { getTaskByIdUseCase(any()) } returns flowOf(Result.Success(sampleTask))
         viewModel = TaskDetailsViewModel(
-            savedStateHandle = savedStateHandle,
+            taskId = sampleTask.id,
             dispatcher = testDispatcher,
             deleteTaskUseCase = deleteTaskUseCase,
             getTaskByIdUseCase = getTaskByIdUseCase
@@ -59,7 +52,6 @@ class TaskDetailsViewModelTest {
 
     @AfterEach
     fun tearDown() {
-        unmockkStatic("androidx.navigation.SavedStateHandleKt")
         Dispatchers.resetMain()
     }
 

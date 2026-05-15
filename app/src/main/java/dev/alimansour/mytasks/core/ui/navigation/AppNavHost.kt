@@ -2,20 +2,21 @@ package dev.alimansour.mytasks.core.ui.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation3.runtime.NavEntry
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.ui.NavDisplay
 import dev.alimansour.mytasks.core.ui.utils.UiText
 import dev.alimansour.mytasks.feature.home.screen.HomeScreen
 import dev.alimansour.mytasks.feature.task.add.screen.NewTaskScreen
 import dev.alimansour.mytasks.feature.task.details.screen.TaskDetailsScreen
+import dev.alimansour.mytasks.feature.task.details.screen.TaskDetailsViewModel
 import dev.alimansour.mytasks.feature.task.update.screen.UpdateTaskScreen
+import dev.alimansour.mytasks.feature.task.update.screen.UpdateTaskViewModel
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun AppNavHost(
@@ -23,72 +24,66 @@ fun AppNavHost(
     onSuccess: (message: UiText) -> Unit,
     showError: (message: UiText) -> Unit,
 ) {
-    val navController = rememberNavController()
+    val navigationState = rememberNavigationState(
+        startRoute = Route.Home,
+        topLevelRoutes = setOf(Route.Home)
+    )
+    val navigator = remember { Navigator(navigationState) }
 
-    NavHost(
-        navController = navController,
-        startDestination = Route.Home,
-        modifier = modifier.fillMaxSize(),
-    ) {
-        composable<Route.Home> {
+    val entryProvider: (NavKey) -> NavEntry<NavKey> = entryProvider {
+        entry<Route.Home> {
             HomeScreen(
-                navigateToRoute = {
-                    navController.navigate(it)
-                },
-                navigateToTaskDetails = {
-                    navController.navigate(Route.TaskDetails(it.id))
-                },
-                onFabClick = { navController.navigate(Route.NewTask) },
+                navigateToRoute = { navigator.navigate(it) },
+                navigateToTaskDetails = { navigator.navigate(Route.TaskDetails(it.id)) },
+                onFabClick = { navigator.navigate(Route.NewTask) },
                 showError = showError,
             )
         }
 
-        composable<Route.NewTask> {
+        entry<Route.NewTask> {
             NewTaskScreen(
-                onNavigationIconClicked = { navController.navigateUpSafely() },
+                onNavigationIconClicked = { navigator.goBack() },
                 onSuccess = {
                     onSuccess(it)
-                    navController.navigateUpSafely()
+                    navigator.goBack()
                 },
                 showError = showError,
             )
         }
 
-        composable<Route.TaskDetails> {
+        entry<Route.TaskDetails> { key ->
+            val viewModel: TaskDetailsViewModel = org.koin.androidx.compose.koinViewModel { org.koin.core.parameter.parametersOf(key.taskId) }
             TaskDetailsScreen(
-                onNavigationIconClicked = { navController.navigateUpSafely() },
-                onUpdateTaskClicked = {
-                    navController.navigate(Route.UpdateTask(it.id))
-                },
+                viewModel = viewModel,
+                onNavigationIconClicked = { navigator.goBack() },
+                onUpdateTaskClicked = { navigator.navigate(Route.UpdateTask(it.id)) },
                 onSuccess = {
                     onSuccess(it)
-                    navController.navigateUpSafely()
+                    navigator.goBack()
                 },
                 showError = showError,
             )
         }
 
-        composable<Route.UpdateTask> {
+        entry<Route.UpdateTask> { key ->
+            val viewModel: UpdateTaskViewModel = org.koin.androidx.compose.koinViewModel { org.koin.core.parameter.parametersOf(key.taskId) }
             UpdateTaskScreen(
-                onNavigationIconClicked = { navController.navigateUpSafely() },
+                viewModel = viewModel,
+                onNavigationIconClicked = { navigator.goBack() },
                 onSuccess = {
                     onSuccess(it)
-                    navController.navigate(Route.Home) {
-                        popUpTo(navController.graph.id) {
-                            inclusive = true
-                        }
-                    }
+                    // Clear backstack and go home
+                    navigator.goBack()
+                    navigator.goBack()
                 },
                 showError = showError,
             )
         }
     }
-}
 
-private fun NavHostController.navigateUpSafely() {
-    if (previousBackStackEntry == null) {
-        navigate(Route.Home)
-    } else {
-        navigateUp()
-    }
+    NavDisplay(
+        modifier = modifier.fillMaxSize(),
+        entries = navigationState.toEntries(entryProvider),
+        onBack = { navigator.goBack() }
+    )
 }
