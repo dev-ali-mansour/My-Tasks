@@ -5,6 +5,7 @@ import dev.alimansour.mytasks.di.module.AppModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.annotation.KoinApplication
+import org.koin.core.logger.Level
 import org.koin.plugin.module.dsl.startKoin
 import timber.log.Timber
 
@@ -14,7 +15,7 @@ class MyApplication : Application() {
         super.onCreate()
 
         startKoin<MyApplication> {
-            androidLogger()
+            androidLogger(level = Level.ERROR)
             androidContext(this@MyApplication)
         }
 

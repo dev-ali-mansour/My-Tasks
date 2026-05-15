@@ -1,8 +1,10 @@
-package dev.alimansour.mytasks.feature.task.details
+package dev.alimansour.mytasks.feature.task.details.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,12 +14,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,63 +30,68 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import dev.alimansour.mytasks.R
 import dev.alimansour.mytasks.core.domain.model.Task
 import dev.alimansour.mytasks.core.ui.common.CommonTopAppBar
-import dev.alimansour.mytasks.core.ui.common.LaunchedUiEffectHandler
 import dev.alimansour.mytasks.core.ui.theme.MyTasksTheme
 import dev.alimansour.mytasks.core.ui.theme.interFamily
 import dev.alimansour.mytasks.core.ui.utils.UiText
-import dev.alimansour.mytasks.core.ui.utils.UiText.StringResourceId
 import dev.alimansour.mytasks.core.ui.utils.getFormattedDate
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun TaskDetailsScreen(
     modifier: Modifier = Modifier,
-    viewModel: TaskDetailsViewModel = koinViewModel(),
+    viewModel: TaskDetailsViewModel,
     onNavigationIconClicked: () -> Unit,
     onUpdateTaskClicked: (Task) -> Unit,
     onSuccess: (message: UiText) -> Unit,
     showError: (message: UiText) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedUiEffectHandler(
-        viewModel.effect,
-        onConsumeEffect = { viewModel.processEvent(TaskDetailsEvent.ConsumeEffect) },
-        onEffect = { effect ->
-            when (effect) {
-                is TaskDetailsEffect.NavigateToUpdateScreen -> {
-                    onUpdateTaskClicked(effect.task)
-                }
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.effect.collect { effect ->
+                when (effect) {
+                    is TaskDetailsEffect.ShowSuccess -> {
+                        onSuccess(UiText.StringResourceId(R.string.task_deleted_success))
+                    }
 
-                is TaskDetailsEffect.ShowSuccess -> {
-                    onSuccess(StringResourceId(R.string.task_updated_success))
-                }
-
-                is TaskDetailsEffect.ShowError -> {
-                    showError(effect.message)
+                    is TaskDetailsEffect.ShowError -> {
+                        showError(effect.message)
+                    }
                 }
             }
-        },
-    )
+        }
+    }
 
     Scaffold(topBar = {
         CommonTopAppBar(title = stringResource(id = R.string.task_details)) {
             onNavigationIconClicked()
         }
     }) { innerPadding ->
-        TaskDetailsContent(modifier = modifier.padding(innerPadding), uiState = uiState, onEvent = viewModel::processEvent)
+        TaskDetailsContent(
+            modifier = modifier,
+            innerPadding = innerPadding,
+            uiState = uiState,
+            onEvent = viewModel::processEvent,
+            onUpdateTaskClicked = onUpdateTaskClicked,
+        )
     }
 }
 
 @Composable
 private fun TaskDetailsContent(
     modifier: Modifier = Modifier,
+    innerPadding: PaddingValues = PaddingValues(0.dp),
     uiState: TaskDetailsState,
     onEvent: (TaskDetailsEvent) -> Unit,
+    onUpdateTaskClicked: (Task) -> Unit,
 ) {
     val context = LocalContext.current
     uiState.task?.let { task ->
@@ -92,9 +99,11 @@ private fun TaskDetailsContent(
         Column(
             modifier =
                 modifier
-                    .padding(16.dp)
                     .fillMaxSize()
-                    .verticalScroll(rememberScrollState()),
+                    .consumeWindowInsets(innerPadding)
+                    .verticalScroll(rememberScrollState())
+                    .padding(innerPadding)
+                    .padding(16.dp),
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
             Column {
@@ -115,7 +124,14 @@ private fun TaskDetailsContent(
 
                 Spacer(Modifier.height(24.dp))
 
-                DetailItem(label = stringResource(R.string.due_date), value = task.dueDate.getFormattedDate(context = context, pattern = "MMMM dd, yyyy"))
+                DetailItem(
+                    label = stringResource(R.string.due_date),
+                    value =
+                        task.dueDate.getFormattedDate(
+                            context = context,
+                            pattern = "MMMM dd, yyyy",
+                        ),
+                )
 
                 Spacer(Modifier.height(16.dp))
 
@@ -123,16 +139,16 @@ private fun TaskDetailsContent(
                     label = stringResource(R.string.status),
                     value =
                         if (task.isCompleted) {
-                            stringResource(R.string.completed)
+                            stringResource(R.string.status_completed)
                         } else {
-                            stringResource(R.string.in_progress)
+                            stringResource(R.string.status_in_progress)
                         },
                 )
             }
 
             Column {
                 Button(
-                    onClick = { onEvent(TaskDetailsEvent.UpdateTask) },
+                    onClick = { onUpdateTaskClicked(task) },
                     modifier =
                         Modifier
                             .fillMaxWidth(),
@@ -220,6 +236,7 @@ private fun TaskDetailsContentPreview() {
                         ),
                 ),
             onEvent = {},
+            onUpdateTaskClicked = {},
         )
     }
 }

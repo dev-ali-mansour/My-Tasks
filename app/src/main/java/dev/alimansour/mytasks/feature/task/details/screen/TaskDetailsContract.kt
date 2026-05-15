@@ -1,4 +1,4 @@
-package dev.alimansour.mytasks.feature.task.details
+package dev.alimansour.mytasks.feature.task.details.screen
 
 import androidx.compose.runtime.Stable
 import dev.alimansour.mytasks.core.domain.model.Task
@@ -8,14 +8,9 @@ import dev.alimansour.mytasks.core.ui.utils.UiText
 data class TaskDetailsState(
     val isLoading: Boolean = false,
     val task: Task? = null,
-    val effect: TaskDetailsEffect? = null,
 )
 
 sealed interface TaskDetailsEffect {
-    data class NavigateToUpdateScreen(
-        val task: Task,
-    ) : TaskDetailsEffect
-
     object ShowSuccess : TaskDetailsEffect
 
     data class ShowError(
@@ -24,13 +19,5 @@ sealed interface TaskDetailsEffect {
 }
 
 sealed interface TaskDetailsEvent {
-    data class LoadTask(
-        val task: Task,
-    ) : TaskDetailsEvent
-
-    object UpdateTask : TaskDetailsEvent
-
     object DeleteTask : TaskDetailsEvent
-
-    object ConsumeEffect : TaskDetailsEvent
 }

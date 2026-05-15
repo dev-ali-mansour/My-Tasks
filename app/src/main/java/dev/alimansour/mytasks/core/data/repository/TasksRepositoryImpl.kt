@@ -29,6 +29,18 @@ class TasksRepositoryImpl(
                 emit(Result.Error(DataError.Local.DATABASE_READ_ERROR))
             }
 
+    override fun getTaskById(id: Long): Flow<Result<Task, DataError.Local>> =
+        taskDao
+            .getTaskById(id)
+            .map<TaskEntity?, Result<Task, DataError.Local>> { taskEntity ->
+                taskEntity?.let {
+                    Result.Success(it.toTask())
+                } ?: Result.Error(DataError.Local.NOT_FOUND)
+            }.catch {
+                // Log the exception 'it' if needed
+                emit(Result.Error(DataError.Local.DATABASE_READ_ERROR))
+            }
+
     override fun addTask(task: Task): Flow<Result<Unit, DataError.Local>> =
         flow {
             runCatching {

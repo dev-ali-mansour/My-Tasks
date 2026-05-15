@@ -1,5 +1,7 @@
-package dev.alimansour.mytasks.feature.home
+package dev.alimansour.mytasks.feature.home.screen
 
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,15 +25,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import dev.alimansour.mytasks.R
 import dev.alimansour.mytasks.core.domain.model.Task
 import dev.alimansour.mytasks.core.ui.common.CommonTopAppBar
-import dev.alimansour.mytasks.core.ui.common.LaunchedUiEffectHandler
 import dev.alimansour.mytasks.core.ui.navigation.Route
 import dev.alimansour.mytasks.core.ui.theme.MyTasksTheme
 import dev.alimansour.mytasks.core.ui.utils.UiText
 import dev.alimansour.mytasks.core.ui.utils.activity
+import dev.alimansour.mytasks.feature.home.component.TaskItem
 import org.koin.androidx.compose.koinViewModel
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
@@ -45,32 +50,33 @@ fun HomeScreen(
     showError: (message: UiText) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
 
-    LaunchedUiEffectHandler(
-        viewModel.effect,
-        onConsumeEffect = { viewModel.processEvent(HomeEvent.ConsumeEffect) },
-        onEffect = { effect ->
-            when (effect) {
-                is HomeEffect.NavigateToRoute -> {
-                    navigateToRoute(effect.route)
-                }
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.effect.collect { effect ->
+                when (effect) {
+                    is HomeEffect.NavigateToRoute -> {
+                        navigateToRoute(effect.route)
+                    }
 
-                is HomeEffect.NavigateToTaskDetails -> {
-                    navigateToTaskDetails(effect.task)
-                }
+                    is HomeEffect.NavigateToTaskDetails -> {
+                        navigateToTaskDetails(effect.task)
+                    }
 
-                is HomeEffect.ShowError -> {
-                    showError(effect.message)
-                }
+                    is HomeEffect.ShowError -> {
+                        showError(effect.message)
+                    }
 
-                is HomeEffect.ExitApp -> {
-                    (context.activity).finishAffinity()
-                    exitProcess(status = 0)
+                    is HomeEffect.ExitApp -> {
+                        (context.activity).finishAffinity()
+                        exitProcess(status = 0)
+                    }
                 }
             }
-        },
-    )
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -95,7 +101,7 @@ fun HomeScreen(
     ) { paddingValues ->
         HomeContent(
             uiState = uiState,
-            modifier = Modifier.padding(paddingValues),
+            innerPadding = paddingValues,
             onEvent = viewModel::processEvent,
         )
     }
@@ -105,6 +111,7 @@ fun HomeScreen(
 private fun HomeContent(
     uiState: HomeState,
     modifier: Modifier = Modifier,
+    innerPadding: PaddingValues = PaddingValues(0.dp),
     onEvent: (HomeEvent) -> Unit,
 ) {
     val listState = rememberLazyListState()
@@ -119,8 +126,12 @@ private fun HomeContent(
     }
 
     LazyColumn(
-        modifier = modifier.fillMaxSize(),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .consumeWindowInsets(innerPadding),
         state = listState,
+        contentPadding = innerPadding,
     ) {
         items(uiState.tasks, key = { task ->
             task.id
@@ -154,13 +165,13 @@ private fun HomeContentPreview() {
                             Task(
                                 id = 2,
                                 title = "Book Appointment",
-                                dueDate = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(1),
+                                dueDate = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(ONE_DAY),
                             ),
-                            Task(id = 3, title = "Pay Bills", dueDate = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(2)),
+                            Task(id = 3, title = "Pay Bills", dueDate = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(TWO_DAYS)),
                             Task(
                                 id = 4,
                                 title = "Schedule Meeting",
-                                dueDate = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(3),
+                                dueDate = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(THREE_DAYS),
                             ),
                         ),
                 ),
@@ -168,3 +179,7 @@ private fun HomeContentPreview() {
         )
     }
 }
+
+private const val ONE_DAY = 1L
+private const val TWO_DAYS = 2L
+private const val THREE_DAYS = 3L

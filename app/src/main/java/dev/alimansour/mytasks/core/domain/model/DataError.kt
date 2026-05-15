@@ -20,5 +20,6 @@ sealed interface DataError : Error {
         UNKNOWN,
         DATABASE_READ_ERROR,
         DATABASE_WRITE_ERROR,
+        NOT_FOUND,
     }
 }

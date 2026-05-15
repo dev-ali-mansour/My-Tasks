@@ -1,16 +1,15 @@
 package dev.alimansour.mytasks
 
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import dev.alimansour.mytasks.core.ui.navigation.AppNavHost
@@ -22,17 +21,9 @@ fun MainApp() {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    Scaffold(
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        },
-        contentWindowInsets = WindowInsets.safeDrawing,
-    ) { innerPadding ->
+    Box(modifier = Modifier.fillMaxSize()) {
         AppNavHost(
-            modifier =
-                Modifier
-                    .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding),
+            modifier = Modifier,
             onSuccess = { uiText ->
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar(
@@ -49,6 +40,14 @@ fun MainApp() {
                     )
                 }
             },
+        )
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier =
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .safeDrawingPadding(),
         )
     }
 }
