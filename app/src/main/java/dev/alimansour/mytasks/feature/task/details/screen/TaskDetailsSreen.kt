@@ -2,6 +2,7 @@ package dev.alimansour.mytasks.feature.task.details.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,7 +36,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import dev.alimansour.mytasks.R
 import dev.alimansour.mytasks.core.domain.model.Task
-import dev.alimansour.mytasks.core.ui.navigation.Route
 import dev.alimansour.mytasks.core.ui.common.CommonTopAppBar
 import dev.alimansour.mytasks.core.ui.theme.MyTasksTheme
 import dev.alimansour.mytasks.core.ui.theme.interFamily
@@ -70,16 +70,15 @@ fun TaskDetailsScreen(
         }
     }
 
-    Scaffold(topBar = {
-        CommonTopAppBar(title = stringResource(id = R.string.task_details)) {
-            onNavigationIconClicked()
-        }
-    }) { innerPadding ->
+    Scaffold(
+        topBar = {
+            CommonTopAppBar(title = stringResource(id = R.string.task_details)) {
+                onNavigationIconClicked()
+            }
+        }) { innerPadding ->
         TaskDetailsContent(
-            modifier =
-                modifier
-                    .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding),
+            modifier = modifier,
+            innerPadding = innerPadding,
             uiState = uiState,
             onEvent = viewModel::processEvent,
             onUpdateTaskClicked = onUpdateTaskClicked,
@@ -90,6 +89,7 @@ fun TaskDetailsScreen(
 @Composable
 private fun TaskDetailsContent(
     modifier: Modifier = Modifier,
+    innerPadding: PaddingValues = PaddingValues(0.dp),
     uiState: TaskDetailsState,
     onEvent: (TaskDetailsEvent) -> Unit,
     onUpdateTaskClicked: (Task) -> Unit,
@@ -100,9 +100,11 @@ private fun TaskDetailsContent(
         Column(
             modifier =
                 modifier
-                    .padding(16.dp)
                     .fillMaxSize()
-                    .verticalScroll(rememberScrollState()),
+                    .consumeWindowInsets(innerPadding)
+                    .verticalScroll(rememberScrollState())
+                    .padding(innerPadding)
+                    .padding(16.dp),
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
             Column {
