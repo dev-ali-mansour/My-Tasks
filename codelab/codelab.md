@@ -290,7 +290,7 @@ jobs:
       # TODO: [5] Setup JAVA 21 and install Gradle
 
       - name: Cache Gradle files
-        uses: actions/cache @v4
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
