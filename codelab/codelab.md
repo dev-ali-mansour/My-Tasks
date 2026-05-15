@@ -1,7 +1,7 @@
 id: my-tasks-github-actions-codelab
 summary: "In this codelab, you’ll complete a GitHub Actions workflow for the My-Tasks Android app."
 authors: Ali Mansour
-updated: 2025-11-24
+updated: 2026-05-15
 status: Published
 categories: android, ci-cd, github-actions
 tags: android, github-actions, ci-cd, compose
@@ -19,7 +19,7 @@ Duration: 4:00
 
 ### About this codelab
 
-**Last Updated:** November 24, 2025
+**Last Updated:** May 15, 2026
 
 **Author:** Ali Mansour
 
@@ -48,7 +48,8 @@ The application we are working on named `My Tasks`
 * A pipeline that automatically:
     1.  Validates the branch name for a pull request.
     2.  Runs all unit tests for the `My-Tasks` app.
-* Job dependencies (validate → build → test).
+    3.  Performs an AI-powered code review and summary.
+* Job dependencies (validate → build → test → ai_review).
 
 
 ### 🎯 What You’ll Learn
@@ -58,6 +59,7 @@ The application we are working on named `My Tasks`
 - How to create job dependencies using `needs`.
 - How to use standard actions like `actions/checkout` and `actions/setup-java`.
 - How to grant permissions and run Gradle commands in a workflow.
+- How to integrate AI analysis into your CI pipeline.
 
 
 ### 🧰 What you'll need
@@ -73,7 +75,7 @@ The application we are working on named `My Tasks`
 
 ## Getting Set Up
 
-Duration: 7:00
+Duration: 8:00
 
 Before we begin, let's get your environment ready.
 
@@ -110,6 +112,7 @@ To enable the automated workflows (Pull Request checks and Google Play deploymen
 | `KEY_PASSWORD`          | Password for your signing key      | The password you set for your signing key        |
 | `ANDROID_KEYSTORE`      | Base64-encoded keystore file       | Run: `base64 -w 0 your-keystore.jks`             |
 | `GOOGLE_PLAY_AUTH_JSON` | Google Play service account JSON   | Download from Google Play Console → API access   |
+| `GEMINI_API_KEY`        | Gemini API key for AI code review  | Generate from [Google AI Studio](https://aistudio.google.com/app/apikey) |
 
 **Creating an Android Keystore (if you don't have one):**
 
@@ -247,7 +250,7 @@ Duration: 5:00
 1.  Make sure you are on the `starter` branch.
 2.  In your repository, navigate to the workflow file: `.github/workflows/pull_request.yml`.
 
-You will see the following content, which includes 7 `TODO` comments. We will now complete them one by one.
+You will see the following content, which includes 11 `TODO` comments. We will now complete them one by one.
 
 ```yaml
 name: Run tests
@@ -257,7 +260,7 @@ run-name: Run test - ${{ github.head_ref }}
 
 jobs:
   validate_pr_sources:
-    # TODO: [2] Configure the runner of this job to the latest Ubuntu version
+    runs-on: ubuntu-latest
     steps:
       - name: Validate source branch
         id: source_check
@@ -277,7 +280,6 @@ jobs:
             echo "Skipping source branch validation because target branch is not main."
           fi
 
-
   run-tests:
     # TODO: [3] Configure this job to run after the source branch is validated
     runs-on: ubuntu-latest
@@ -288,7 +290,7 @@ jobs:
       # TODO: [5] Setup JAVA 21 and install Gradle
 
       - name: Cache Gradle files
-        uses: actions/cache@v4
+        uses: actions/cache @v4
         with:
           path: |
             ~/.gradle/caches
@@ -300,6 +302,27 @@ jobs:
       # TODO: [6] Grant execution permission for the Gradle wrapper file
 
       # TODO: [7] Run the unit tests
+
+
+  ai_review:
+    needs: run-tests
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout @v4
+        with:
+          fetch-depth: 0
+
+      # TODO: [8] Set up Python
+
+      # TODO: [9] Install Gemini SDK
+
+      # TODO: [10] Run AI PR Summary & Smart Analysis
+
+      # TODO: [11] Post Comprehensive Comment to PR
 ```
 
 ---
@@ -458,6 +481,104 @@ Finally, it's time to run the tests! We'll use the `gradlew` script we just made
 ```yaml
       - name: Run unit tests
         run: ./gradlew test
+```
+
+---
+
+## Configure the AI Review Job
+
+Duration: 8:00
+
+The final piece of our CI pipeline is an automated AI code review. This job will summarize the changes in the pull request and perform a smart static analysis using Gemini.
+
+### ✅ Set up Python
+
+The AI review scripts are written in Python. We need to set up a Python environment on the runner.
+
+**Replace this:**
+
+```yaml
+      # TODO: [8] Set up Python
+```
+
+**With this:**
+
+```yaml
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+```
+
+### ✅ Install Gemini SDK
+
+Our scripts depend on the `google-genai` package to interact with the Gemini API.
+
+**Replace this:**
+
+```yaml
+      # TODO: [9] Install Gemini SDK
+```
+
+**With this:**
+
+```yaml
+      - name: Install Gemini SDK
+        run: pip install google-genai
+```
+
+### ✅ Run AI PR Summary & Smart Analysis
+
+Now we'll execute the scripts. This step requires a `GEMINI_API_KEY` which should be stored as a GitHub secret.
+
+**Replace this:**
+
+```yaml
+      # TODO: [10] Run AI PR Summary & Smart Analysis
+```
+
+**With this:**
+
+```yaml
+      - name: Run AI PR Summary & Smart Analysis
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          # Get the diff
+          git diff origin/${{ github.base_ref }} HEAD > pr_diff.txt
+          
+          # Initialize the comment file
+          echo "## 🤖 AI Code Reviewer" > final_comment.txt
+          echo "" >> final_comment.txt
+          
+          # 1. Run the Summary Script
+          echo "### 📝 PR Summary" >> final_comment.txt
+          cat pr_diff.txt | python scripts/pr_reviewer.py >> final_comment.txt
+          echo "" >> final_comment.txt
+          
+          # 2. Run the Smart Static Analysis Script
+          echo "### 🔍 Smart Static Analysis" >> final_comment.txt
+          cat pr_diff.txt | python scripts/smart_analyzer.py >> final_comment.txt
+```
+
+### ✅ Post Comprehensive Comment to PR
+
+Finally, we'll post the results of the AI analysis as a comment on the pull request using the GitHub CLI (`gh`).
+
+**Replace this:**
+
+```yaml
+      # TODO: [11] Post Comprehensive Comment to PR
+```
+
+**With this:**
+
+```yaml
+      - name: Post Comprehensive Comment to PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body-file final_comment.txt
 ```
 
 ---
