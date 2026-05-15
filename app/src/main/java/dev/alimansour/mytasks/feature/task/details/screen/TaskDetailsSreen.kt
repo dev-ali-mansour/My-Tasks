@@ -59,7 +59,7 @@ fun TaskDetailsScreen(
             viewModel.effect.collect { effect ->
                 when (effect) {
                     is TaskDetailsEffect.ShowSuccess -> {
-                        onSuccess(UiText.StringResourceId(R.string.task_updated_success))
+                        onSuccess(UiText.StringResourceId(R.string.task_deleted_success))
                     }
 
                     is TaskDetailsEffect.ShowError -> {
@@ -70,12 +70,11 @@ fun TaskDetailsScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            CommonTopAppBar(title = stringResource(id = R.string.task_details)) {
-                onNavigationIconClicked()
-            }
-        }) { innerPadding ->
+    Scaffold(topBar = {
+        CommonTopAppBar(title = stringResource(id = R.string.task_details)) {
+            onNavigationIconClicked()
+        }
+    }) { innerPadding ->
         TaskDetailsContent(
             modifier = modifier,
             innerPadding = innerPadding,
@@ -140,9 +139,9 @@ private fun TaskDetailsContent(
                     label = stringResource(R.string.status),
                     value =
                         if (task.isCompleted) {
-                            stringResource(R.string.completed)
+                            stringResource(R.string.status_completed)
                         } else {
-                            stringResource(R.string.in_progress)
+                            stringResource(R.string.status_in_progress)
                         },
                 )
             }

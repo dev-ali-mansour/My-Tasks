@@ -26,6 +26,7 @@
     <string name="select_date">Select Date</string>
     <string name="due_date">Due Date</string>
     <string name="task_add_success">Task has been added successfully</string>
+    <string name="task_deleted_success">Task has been deleted successfully</string>
     <string name="task_updated_success">Task has been updated successfully</string>
     <string name="title_cannot_be_empty">Title cannot be empty</string>
     <string name="description_cannot_be_empty">Description can not be empty\n</string>
@@ -33,8 +34,8 @@
     <string name="delete_task">Delete Task</string>
     <string name="task_details">Task Details</string>
     <string name="status">Status</string>
-    <string name="in_progress">In Progress</string>
-    <string name="completed">Completed</string>
+    <string name="status_in_progress">In Progress</string>
+    <string name="status_completed">Completed</string>
     <string name="add_task">Add task</string>
     <plurals name="due_days_ago">
         <item quantity="one">Due %1$d day ago</item>

@@ -70,6 +70,7 @@ class TaskDetailsViewModel(
             when (event) {
                 is TaskDetailsEvent.DeleteTask -> {
                     _uiState.value.task?.let { task ->
+                        loadTaskJob?.cancel()
                         deleteTaskJob?.cancel()
                         deleteTaskJob = launchDeleteTask(task)
                     }
@@ -93,6 +94,7 @@ class TaskDetailsViewModel(
                             it.copy(isLoading = false)
                         }
                         _effect.send(TaskDetailsEffect.ShowError(message = error.toUiText()))
+                        loadTask()
                     }
             }
         }
