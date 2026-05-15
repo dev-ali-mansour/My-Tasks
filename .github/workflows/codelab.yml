@@ -6,6 +6,11 @@ on:
       - main
     paths:
       - 'codelab/codelab.md'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'codelab/codelab.md'
 
   workflow_dispatch:
 
