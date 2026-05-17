@@ -21,6 +21,7 @@ mockk = "1.14.9"
 junitJupiter = "6.0.3"
 androidJunit5Plugin = "2.0.1"
 splashScreen = "1.2.0"
+desugarJdkLibs = "2.1.5"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -61,6 +62,7 @@ junit-bom={group="org.junit",name="junit-bom",version.ref="junitJupiter"}
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter"}
 junit-platform-launcher = { group = "org.junit.platform", name = "junit-platform-launcher" }
 splashScreen = { module = "androidx.core:core-splashscreen", version.ref = "splashScreen" }
+desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugarJdkLibs" }
 
 [bundles]
 koin-core = [
